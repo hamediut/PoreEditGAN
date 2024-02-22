@@ -1,0 +1,41 @@
+import os
+import numpy as np
+import pandas as pd
+import tifffile
+from tqdm import tqdm
+from typing import List, Dict
+from tqdm import tqdm
+
+def get_img_name_clean(df_log, df_labels, mse_thresh = 1e-5, only_connect =False,  exp = ['KBr6', 'KBr7']):
+    
+    """This function goes through the log file of inverting images and finds well-inverted images i.e.,
+    whose mse error is lower thatn a threshold.
+    It has option to only look at images of specific experiments
+    
+    Note: if exp = None, it looks at all the experiments"""
+    
+    list_img_name = list(np.unique(df_log['img_name'].values)) # get list of all images
+
+    img_name_clean = {} # images with good recnonstruction
+    for name in tqdm(list_img_name):
+        if exp is None:
+            min_s2 = df_log.loc[df_log['img_name'] == name]['mse'].min()
+            if only_connect:
+                if df_labels.loc[df_labels['img_name']== name]['labels_3class'].values[0] ==2 and min_s2 < mse_thresh:
+                    img_name_clean[name] = min_s2
+            else:
+                
+                if min_s2 < mse_thresh: #good results for <1e-6
+                    img_name_clean[name] = min_s2
+            
+        elif name.startswith(f'{exp[0]}') or name.startswith(f'{exp[1]}'):
+            min_s2 = df_log.loc[df_log['img_name'] == name]['mse'].min()
+            
+            if only_connect:
+                if df_labels.loc[df_labels['img_name']== name]['labels_3class'].values[0] ==2 and min_s2 < mse_thresh:
+                    img_name_clean[name] = min_s2
+            else: 
+                if min_s2 < mse_thresh: #good results for <1e-6
+                    img_name_clean[name] = min_s2
+                
+    return img_name_clean
