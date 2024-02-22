@@ -35,26 +35,3 @@ def parse_args():
 
   
   return parser.parse_args()
-
-
-def get_boundary():
-  args =parse_args()
-
-  df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))
-  latent_codes_dict =  joblib.load(os.path.join(args.dir_inputs, 'latent_codes.pkl'))
-  df_log = pd.read_csv(os.path.join(args.dir_inputs, 'df_log_clean_all.csv'))
-
-  img_name_clean = get_img_name_clean(df_log, mse_thresh= args.mse_thresh)
-  latent_codes_np_clean, labels_clean, list_codes_clean = get_clean_codes_labels(img_name_clean, latent_codes_dict, df_labels, res = args.res)
-
-  classifier, boundary = train_boundary(latent_codes_np_clean, labels_clean, split_ratio= 0.7)
-
-  joblib.dump(boundary, os.path.join(args.dir_inputs, f'boundary_{args.mse_thresh}.pkl'))
-  joblib.dump(classifier, os.path.join(args.dir_inputs, f'classifier_{args.mse_thresh}'))
-
-  print(f'Boundary shape: {boundary.shape}')
-  print(boundary)
-
-
-if __name__=="__main__":
-  get_boundary()
