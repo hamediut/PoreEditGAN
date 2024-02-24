@@ -29,6 +29,7 @@ path_label_imgs = r'D:\Hamed\stylegan3-main\training-runs\00064-Resume_from_61_s
 path_df_labels = r'D:\Hamed\stylegan3-main\training-runs\00064-Resume_from_61_stylegan2-Exp6_7_29k-gpus1-batch8-gamma6.5536\inference'
 df_labels_file = r'df_labels_new_3class.csv'
 labels_npy_file = r'labels_3class.npy'
+
 ##path to the codes
 path_codes = r'D:\Hamed\stylegan3-main\training-runs\00068-Inverting_Labelled_imgs-Exp6_7_29k-VGG-Grun64_Erun65-22200'
 latent_codes_file = r'latent_codes.pkl'

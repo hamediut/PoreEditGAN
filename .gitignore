@@ -1,6 +1,8 @@
 # my test files
 directories.txt
+run_examples.txt
 Dataset/
+Results/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
