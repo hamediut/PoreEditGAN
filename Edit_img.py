@@ -33,7 +33,7 @@ def parse_args():
                        help='Path to the folder containing images you want to edit. ')
   
   parser.add_argument('--dir_latents', required= True, type=str,
-                       help='Path to latent codes pkl file. ')
+                       help='Path to latent codes pkl files. ')
 #   parser.add_argument('--res', type=int,
 #                         help='size of images')
   
@@ -111,7 +111,7 @@ def connect_pores():
         interpolation_recons_thresh = np.where(_get_tensor_value(interpolation_recons)[i] > thresh, 1, 0)
         interpolation_recons_binary[i] = interpolation_recons_thresh[0].astype(np.uint8)
     
-    tifffile.imsave(os.path.join(args.dir_output ,f'{os.path.splitext(img_name)[0]}_boundary_1e6.tif'), interpolation_recons_binary)
+    tifffile.imsave(os.path.join(args.dir_output ,f'{os.path.splitext(img_name)[0]}_boundary_1e5.tif'), interpolation_recons_binary)
 
 
 if __name__=='__main__':

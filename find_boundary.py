@@ -17,10 +17,9 @@ from src.utils import get_img_name_clean, get_clean_codes_labels, train_boundary
 def parse_args():
   """Parses arguments."""
   parser = argparse.ArgumentParser()
-  parser.add_argument('--dir_inputs', required= False, type=str,
+  parser.add_argument('--dir_inputs', required= True, type=str,
                        help='Full path to the log file for inverting images. ')
-  parser.add_argument('--res', type=int,
-                        help='size of images')
+  parser.add_argument('--res', type=int, required= True, help='size of images')
   
   parser.add_argument('--mse_thresh', type=float, default =1e-6,
                         help='mse thrshold used to only get the latent codes of high quality inversions')
@@ -50,10 +49,11 @@ def get_boundary():
   classifier, boundary = train_boundary(latent_codes_np_clean, labels_clean, split_ratio= 0.7)
 
   joblib.dump(boundary, os.path.join(args.dir_inputs, f'boundary_{args.mse_thresh}.pkl'))
-  joblib.dump(classifier, os.path.join(args.dir_inputs, f'classifier_{args.mse_thresh}'))
+  joblib.dump(classifier, os.path.join(args.dir_inputs, f'classifier_{args.mse_thresh}.pkl'))
+  joblib.dump(list_codes_clean, os.path.join(args.dir_inputs, f'clean_codes_{args.mse_thresh}.pkl'))
 
   print(f'Boundary shape: {boundary.shape}')
-  print(boundary)
+  # print(boundary)
 
 
 if __name__=="__main__":
