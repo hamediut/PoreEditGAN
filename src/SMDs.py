@@ -5,7 +5,7 @@ from typing import Dict, List
 import os
 import shutil
 import subprocess
-import glob
+from glob import glob
 
 
 @jit 
@@ -99,7 +99,6 @@ def calculate_smd_list(images):
 #         Nr_list.append(Nr)
         return S2_average, f_average
 
-
 class Microstructure:
     # init method
     def __init__(self, dims, ns):
@@ -191,6 +190,7 @@ class Microstructure:
         extension = '.txt'
         myname = self.name
         filename = file_path + myname + '_' + mconfig + extension
+        # filename = os.path.join(file_path, myname + '_' + mconfig + extension)
 
         file = open(filename, 'w')
         # print dims
@@ -423,7 +423,7 @@ def twoDCTimage2structure_mod(binary_image, par={'name': 'microstructure_from_im
     return output_microstructure
 
 
-def calculate_polytopes(images, output_path, par, outputPn, cpathPn, runtimePn, polytope= 's2'):
+def calculate_polytopes(images, par, outputPn, cpathPn, runtimePn, polytope= 's2'):
     
     """this functions calculates polytopes for each image in batch and returns a dataframe with average polytope values.
      it also removes the **Mconfig.txt files in the runtime/output folder.
@@ -486,7 +486,7 @@ def calculate_polytopes(images, output_path, par, outputPn, cpathPn, runtimePn, 
                 fn_list.append(img_micr.scal_autocov)
             else:
                 raise Exception('Polytope function name is not correct. use one of the s2, p3h, p3v, p4, p6, or L')
-        for filename in glob(output_path + '/batch*'):
+        for filename in glob(outputPn + '/batch*'):
             os.remove(filename)         
         return poly_list, fn_list
     
@@ -504,7 +504,7 @@ def calculate_polytopes(images, output_path, par, outputPn, cpathPn, runtimePn, 
         img_micr.calculate_scaled_autocovariance()
         img_micr.calculate_polytope_fn()
         
-        for filename in glob(output_path + '/batch*'):
+        for filename in glob(outputPn + '/batch*'):
             os.remove(filename) 
 
         if polytope == 's2':
@@ -528,6 +528,6 @@ def calculate_polytopes(images, output_path, par, outputPn, cpathPn, runtimePn, 
         else:
             raise Exception('Polytope function name is not correct. use one of the s2, p3h, p3v, p4,  p6, or L')
             
-    for filename in glob(output_path + '/batch*'):
+    for filename in glob(outputPn + '/batch*'):
             os.remove(filename) 
  
