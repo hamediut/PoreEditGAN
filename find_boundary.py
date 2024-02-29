@@ -11,7 +11,7 @@ SEED = 43
 random.seed(SEED)
 np.random.seed(SEED)
 
-from src.utils import get_img_name_clean, get_clean_codes_labels, train_boundary
+from src.utils import get_img_name_high, get_codes_high, train_boundary
 
 ## parsing arguments
 def parse_args():
@@ -39,22 +39,22 @@ def parse_args():
 def get_boundary():
   args =parse_args()
 
-  df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))
+  df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))[:-1] # Remove the last row because there is no latent code for that image
+  
   latent_codes_dict =  joblib.load(os.path.join(args.dir_inputs, 'latent_codes.pkl'))
   df_log = pd.read_csv(os.path.join(args.dir_inputs, 'df_log_clean_all.csv'))
 
-  img_name_clean = get_img_name_clean(df_log, mse_thresh= args.mse_thresh)
-  latent_codes_np_clean, labels_clean, list_codes_clean = get_clean_codes_labels(img_name_clean, latent_codes_dict, df_labels, res = args.res)
+  img_name_high = get_img_name_high(df_log, mse_thresh= args.mse_thresh)
+  labels_high = [df_labels.loc[df_labels['img_name']== name, 'labels_3class'].values[0] for name in img_name_high]
+  # print(img_name_clean)
+  latent_codes_high = get_codes_high(img_name_high, latent_codes_dict, res = args.res)
 
-  classifier, boundary = train_boundary(latent_codes_np_clean, labels_clean, split_ratio= 0.7)
+  classifier, boundary = train_boundary(latent_codes_high, np.array(labels_high), split_ratio= 0.7)
 
   joblib.dump(boundary, os.path.join(args.dir_inputs, f'boundary_{args.mse_thresh}.pkl'))
   joblib.dump(classifier, os.path.join(args.dir_inputs, f'classifier_{args.mse_thresh}.pkl'))
-  joblib.dump(list_codes_clean, os.path.join(args.dir_inputs, f'clean_codes_{args.mse_thresh}.pkl'))
-
-  print(f'Boundary shape: {boundary.shape}')
-  # print(boundary)
-
+  joblib.dump(img_name_high, os.path.join(args.dir_inputs, f'img_names_high_{args.mse_thresh}.pkl'))
+ 
 
 if __name__=="__main__":
   get_boundary()

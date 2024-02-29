@@ -17,7 +17,6 @@ SEED = 43
 random.seed(SEED)
 np.random.seed(SEED)
 
-from src.utils import get_img_name_clean, get_clean_codes_labels, train_boundary
 
 import legacy
 import dnnlib
@@ -33,16 +32,16 @@ def parse_args():
                        help='Path to the folder containing images you want to edit. ')
   
   parser.add_argument('--dir_latents', required= True, type=str,
-                       help='Path to latent codes pkl files. ')
+                       help='Path to latent codes pkl file. ')
 #   parser.add_argument('--res', type=int,
 #                         help='size of images')
   
-  parser.add_argument('--dir_boundary', required=True, type= str, help = 'Full path to the boundary file *.pkl')
-  parser.add_argument('--dir_classifier', required=False, type= str, help = 'Full path to the classifier file: *.pkl')
+  parser.add_argument('--dir_boundary', required = True, type= str, help = 'Full path to the boundary file *.pkl')
+  parser.add_argument('--dir_classifier', required = False, type= str, help = 'Full path to the classifier file: *.pkl')
   
 #   parser.add_argument('--max_omega', type=float, default =0.15, help = 'Maximum value for omega to determine the maximum editing')
-  parser.add_argument('--G_pkl', required =True, help = 'Full path to the pre-trained')
-  parser.add_argument('--dir_output', required =True, help = 'Full path to the pre-trained')
+  parser.add_argument('--G_pkl', required = True, help = 'Full path to the pre-trained')
+  parser.add_argument('--dir_output', required = True, help = 'Full path to the pre-trained')
 
 #   parser.add_argument('--RES', required= True, type = int,
 #                       help = 'Representative image size' )

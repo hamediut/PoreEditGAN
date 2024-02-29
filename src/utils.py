@@ -11,59 +11,49 @@ from sklearn import svm
 def _get_tensor_value(tensor):
   """Gets the value of a torch Tensor."""
   return tensor.cpu().detach().numpy()
-def get_img_name_clean(df_log, mse_thresh = 1e-5 ):
+
+def get_img_name_high(df_log:pd.DataFrame, mse_thresh: float = 1e-5 ) -> List[str]:
+
+
     
     """This function goes through the log file of inverting images and finds well-inverted images i.e.,
-    whose mse error is lower thatn a threshold.
+    whose mse error is lower than a threshold.
     """
-    
-    list_img_name = list(np.unique(df_log['img_name'].values)) # get list of all images
-
-    img_name_clean = {} # images with good recnonstruction
-    for name in tqdm(list_img_name):
-        min_s2 = df_log.loc[df_log['img_name'] == name]['mse'].min()
-
-        if min_s2 < mse_thresh: #good results for <1e-6
-            img_name_clean[name] = min_s2
+    # Group by 'img_name' and find the minimum 'mse' for each group
+    min_mse_by_img = df_log.groupby('img_name')['mse'].min().reset_index()
+       # Filter rows where 'mse' is below the threshold
+    well_inverted_imgs = min_mse_by_img[min_mse_by_img['mse'] < mse_thresh]
+    # get the list of image names of high quality inversion
+    list_imgs_name_high = well_inverted_imgs['img_name'].values
  
-    return img_name_clean
+    return list_imgs_name_high
 
 
-def get_clean_codes_labels(img_name_clean, latent_codes_dict, df_labels, res = 256):
-    """This function find the labels and latent codes corresponding to the well-inverted images
+def get_codes_high(img_name_clean: List[str], latent_codes_dict: Dict[str, np.ndarray], res: int = 256) -> np.ndarray:
+
+    """This function find the latent codes corresponding to the well-inverted images, high quality inversions
     
     parameters:
     img_name_clean: a dictionary containing images'name and the best mse (< thresh)
     latent_codes_dict: a dictionary containing images' name and their corresponding latent codes.
-    df_labels: the dataframe containing all images'name and their labels (with different labelling strategies)
-    
+
     returns:
     clean codes: a numpy of size (number of clean images, num_ws, w_dim)
-    clean labels: as a 1D numpy array
     Note that num_ws depends on the image resolution:
     num_ws = 14 for res = 256,
     num_ws = 16 for res = 512,
     """
     ws_dim = (14 , 512) if res == 256 else (16, 512) if res ==512 else None
-    # get same keys in both dictionaries (with all images and clean images)
-    similar_dict = set(list(img_name_clean.keys())).intersection(list(latent_codes_dict.keys()))
-    # sort the codes as the above functions gets same dictionary with arbotrary order of key names
-    list_codes_clean = sorted(list(similar_dict))
-    
-    latent_codes_np_clean = np.zeros((len(list_codes_clean), ws_dim[0], ws_dim[1]))
-    labels_clean = []
-    # labels_clean_idx = []
-    for idx, name in enumerate(list_codes_clean):
 
-        label = df_labels.loc[df_labels['img_name']== name, 'labels_3class'].values[0]
-        labels_clean.append(label)
-        latent_codes_np_clean[idx] = latent_codes_dict[name]
-    
-    assert(len(labels_clean) == latent_codes_np_clean.shape[0] == len(list_codes_clean))
-    print(f'Reconstruction of {len(list_codes_clean)} was successful.')
-    print(f'corresponding {len(labels_clean)} labels were selected.') 
-    
-    return latent_codes_np_clean, np.array(labels_clean), list_codes_clean
+    latent_codes_clean= {key: value for key, value in latent_codes_dict.items() if key in img_name_clean}
+    numpy_arrays = [value for key, value in latent_codes_clean.items()]
+    latent_codes_np_high = np.squeeze(np.stack(numpy_arrays), axis = 1)
+
+    assert(latent_codes_np_high.shape[0] == len(img_name_clean))
+    print(f' {len(img_name_clean)} clean latent codes are obtained.')
+
+    return latent_codes_np_high
+
 
 def train_boundary(latent_codes, labels, split_ratio = 0.7):
     num_samples = latent_codes.shape[0]
