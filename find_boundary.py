@@ -39,13 +39,14 @@ def parse_args():
 def get_boundary():
   args =parse_args()
 
-  df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))[:-1] # Remove the last row because there is no latent code for that image
-  
+  # df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))[:-1] # Remove the last row because there is no latent code for that image
+  df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'labels.csv'))[:-1] # labels obtained from the classifier
   latent_codes_dict =  joblib.load(os.path.join(args.dir_inputs, 'latent_codes.pkl'))
   df_log = pd.read_csv(os.path.join(args.dir_inputs, 'df_log_clean_all.csv'))
 
   img_name_high = get_img_name_high(df_log, mse_thresh= args.mse_thresh)
-  labels_high = [df_labels.loc[df_labels['img_name']== name, 'labels_3class'].values[0] for name in img_name_high]
+  # labels_high = [df_labels.loc[df_labels['img_name']== name, 'labels_3class'].values[0] for name in img_name_high]
+  labels_high = [df_labels.loc[df_labels['img_name']== name, 'preds_label'].values[0] for name in img_name_high] # with classifier
   # print(img_name_clean)
   latent_codes_high = get_codes_high(img_name_high, latent_codes_dict, res = args.res)
 

@@ -47,14 +47,15 @@ def quantify_imgs():
     args = parse_args()
     
     img = tifffile.imread(os.path.join(args.path_input)).astype(np.uint8)
-
+    print(f'Image shape: {img.shape}')
     poly_dict = {}
-    # list_polytopes = [ 'p3h', 'p3v','p4','p6', 'L']
-    list_polytopes = ['p3v','p4']
+    list_polytopes = [ 'p3h', 'p3v','p4','p6', 'L']
+    # list_polytopes = ['p3h','p4', 'L']
     base_poly_path = r'D:\Hamed\PSI\Results\compiled_poly_cpps'
 
     min_img_size = min(img.shape[1], img.shape[2]) if img.ndim==3 else min(img.shape[0], img.shape[1])
-    start_slice = 0
+
+    # start_slice = 0
 
     # n_sample: image size
     par={'name':'polytopes','begx': 0, 'begy': 0, 'nsamp': min_img_size, 'edge_buffer': 0,
@@ -84,19 +85,17 @@ def quantify_imgs():
     print(f'outputPn: {outputPn}')
 
 
-
-
     for poly in list_polytopes:
         
         if poly == 'p2':
             
-            s2, f2 = calculate_smd_list(img[start_slice:])
+            s2, f2 = calculate_smd_list(img)
             poly_dict['s2'] = s2
             poly_dict['f2'] = f2
             print(f"S2 shape: {poly_dict['s2'][0].shape}")
 
         else:
-            poly1, poly2 = calculate_polytopes(img[start_slice::10], par, outputPn, cpathPn, runtimePn, polytope = poly)
+            poly1, poly2 = calculate_polytopes(img, par, outputPn, cpathPn, runtimePn, polytope = poly)
             poly_dict[poly] = poly1
             # we determine the name of poly stored in the dict as key: f3h, f3v, f4, f6, fL
             poly2_name = poly.replace('p', 'f') if poly.startswith('p') else 'f' + poly

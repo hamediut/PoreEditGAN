@@ -1,6 +1,7 @@
 ## Here are the path to the models and data used in the project
 
 # path to the generator trained with both synchrotron and SEM imsges: res =256
+
 path_trained_G = r'D:\Hamed\stylegan3-main\training-runs\00100-UpToRun103_stylegan2-Exp6_7_3percent_LT2_256-gpus1-batch32-gamma0.8192-RandomNoise-Res256-lr.0025'
 G_pkl = r'network-snapshot-012800.pkl'
 
@@ -14,6 +15,8 @@ path_label_imgs = r'D:\Hamed\stylegan3-main\training-runs\00101-EncoderTrain-Exp
 path_df_labels = r'D:\Hamed\stylegan3-main\training-runs\00101-EncoderTrain-Exp6_7_LT2-VGG-Grun103-Batch16-gamma1.6384-NoADA-NoNoise-Trained_D\labelling'
 df_labels_file = r'df_labels_training.csv'
 labels_npy_file = r'labels_3class.npy'
+--> these images have been used to train the classifier (alireza did)
+
 
 ##path to the codes
 path_codes = r'D:\Hamed\stylegan3-main\training-runs\00104-Resume103_Invert_TrainImgs-Exp6_7_3percent_LT2_256-VGG-Grun100_Erun101-model118600'
