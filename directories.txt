@@ -15,7 +15,7 @@ path_label_imgs = r'D:\Hamed\stylegan3-main\training-runs\00101-EncoderTrain-Exp
 path_df_labels = r'D:\Hamed\stylegan3-main\training-runs\00101-EncoderTrain-Exp6_7_LT2-VGG-Grun103-Batch16-gamma1.6384-NoADA-NoNoise-Trained_D\labelling'
 df_labels_file = r'df_labels_training.csv'
 labels_npy_file = r'labels_3class.npy'
---> these images have been used to train the classifier (alireza did)
+
 
 
 ##path to the codes
@@ -29,9 +29,11 @@ path_log_txt = os.path.join(path_codes, 'log_clean_all.txt')
 res = 512
 ## path to the label images and files
 path_label_imgs = r'D:\Hamed\stylegan3-main\training-runs\00064-Resume_from_61_stylegan2-Exp6_7_29k-gpus1-batch8-gamma6.5536\labelled_images'
+--> these images have been used to train the classifier (alireza did)
 path_df_labels = r'D:\Hamed\stylegan3-main\training-runs\00064-Resume_from_61_stylegan2-Exp6_7_29k-gpus1-batch8-gamma6.5536\inference'
 df_labels_file = r'df_labels_new_3class.csv'
 labels_npy_file = r'labels_3class.npy'
+
 
 ##path to the codes
 path_codes = r'D:\Hamed\stylegan3-main\training-runs\00068-Inverting_Labelled_imgs-Exp6_7_29k-VGG-Grun64_Erun65-22200'

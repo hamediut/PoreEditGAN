@@ -110,7 +110,7 @@ def connect_pores():
         interpolation_recons_thresh = np.where(_get_tensor_value(interpolation_recons)[i] > thresh, 1, 0)
         interpolation_recons_binary[i] = interpolation_recons_thresh[0].astype(np.uint8)
     
-    tifffile.imsave(os.path.join(args.dir_output ,f'{os.path.splitext(img_name)[0]}_boundary_1e5.tif'), interpolation_recons_binary)
+    tifffile.imsave(os.path.join(args.dir_output ,f'{os.path.splitext(img_name)[0]}_boundary_1e6_class.tif'), interpolation_recons_binary)
 
 
 if __name__=='__main__':

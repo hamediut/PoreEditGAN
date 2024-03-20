@@ -255,7 +255,8 @@ def fine_tune_resnet50()-> None:
    # 1: in between
    # 2: connected
    # to find the threshold values, save model predictions and plot the histogram
-   best_thresh1 = 0.162
+   # best_thresh1 = 0.162 # obtained from histogram to match with manual labels
+   best_thresh1 = 0.15
    best_thresh2 = 0.95
    conditions = [
         (df_labels['preds'] < best_thresh1),
