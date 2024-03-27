@@ -86,7 +86,7 @@ class Logger(object):
             self.file.write(text)
 
         self.stdout.write(text)
-        sys.__stdout__.write(text) # h: added to print to original stdout
+        # sys.__stdout__.write(text) # h: added to print to original stdout
 
         if self.should_flush:
             self.flush()
