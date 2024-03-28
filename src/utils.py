@@ -46,13 +46,18 @@ def get_codes_high(img_name_clean: List[str], latent_codes_dict: Dict[str, np.nd
     ws_dim = (14 , 512) if res == 256 else (16, 512) if res ==512 else None
 
     latent_codes_clean= {key: value for key, value in latent_codes_dict.items() if key in img_name_clean}
-    numpy_arrays = [value for key, value in latent_codes_clean.items()]
-    latent_codes_np_high = np.squeeze(np.stack(numpy_arrays), axis = 1)
+    # numpy_arrays = [value for key, value in latent_codes_clean.items()]
+    # latent_codes_np_high = np.squeeze(np.stack(numpy_arrays), axis = 1)
 
-    assert(latent_codes_np_high.shape[0] == len(img_name_clean))
-    print(f' {len(img_name_clean)} clean latent codes are obtained.')
+    ## fore res = 256, there are some clean images that are not in the latent_codes_dict, for mse 1e-5, 353 images
+    # for this reason next line gives an error, but it is not necessary so commented out 
+    
+    # assert(latent_codes_np_high.shape[0] == len(img_name_clean))
+    
+    # print(f' {len(img_name_clean)} clean images are obtained.')
+    # print(f' {latent_codes_np_high.shape[0]} latent codes are obtained.')
 
-    return latent_codes_np_high
+    return latent_codes_clean
 
 
 def train_boundary(latent_codes, labels, split_ratio = 0.7):

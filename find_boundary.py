@@ -32,29 +32,45 @@ def parse_args():
 #   parser.add_argument('--z_channels', type = int, default = 16,
 #                       help = 'number of channles in noise vector.')
 
-  
   return parser.parse_args()
 
 
 def get_boundary():
   args =parse_args()
 
-  # df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))[:-1] # Remove the last row because there is no latent code for that image
-  df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'labels.csv'))[:-1] # labels obtained from the classifier
+  df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))[:-1] # Remove the last row because there is no latent code for that image
+  # df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv')) # Remove the last row because there is no latent code for that image
+
+  # df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'labels.csv'))[:-1] # labels obtained from the classifier
   latent_codes_dict =  joblib.load(os.path.join(args.dir_inputs, 'latent_codes.pkl'))
   df_log = pd.read_csv(os.path.join(args.dir_inputs, 'df_log_clean_all.csv'))
 
   img_name_high = get_img_name_high(df_log, mse_thresh= args.mse_thresh)
-  # labels_high = [df_labels.loc[df_labels['img_name']== name, 'labels_3class'].values[0] for name in img_name_high]
-  labels_high = [df_labels.loc[df_labels['img_name']== name, 'preds_label'].values[0] for name in img_name_high] # with classifier
+  # print(len(img_name_high))
+  # print(img_name_high)
+
+
   # print(img_name_clean)
-  latent_codes_high = get_codes_high(img_name_high, latent_codes_dict, res = args.res)
+  latent_codes_high_dict = get_codes_high(img_name_high, latent_codes_dict, res = args.res)
+  labels_high = [df_labels.loc[df_labels['img_name']== name, 'labels_3class'].values[0] for name in list(latent_codes_high_dict.keys())]
+  # labels_high = [df_labels.loc[df_labels['img_name']== name, 'preds_label'].values[0] for name in img_name_high] # with classifier
+  numpy_arrays = [value for key, value in latent_codes_high_dict.items()]
+  latent_codes_np_high = np.squeeze(np.stack(numpy_arrays), axis = 1)
+  print(f'number of high quality reconstructions images: {len(img_name_high)}')
+  print(f'number of high quality labels: {len(labels_high)}')
+  print(f'number of high quality latent codes: {latent_codes_np_high.shape[0]}')
 
-  classifier, boundary = train_boundary(latent_codes_high, np.array(labels_high), split_ratio= 0.7)
+  if len(img_name_high) != latent_codes_np_high.shape[0]:
+    img_name_high = [name for name in list(latent_codes_high_dict.keys())]
+    print(f'number of high quality reconstructions images: {len(img_name_high)}')
 
-  joblib.dump(boundary, os.path.join(args.dir_inputs, f'boundary_{args.mse_thresh}_class.pkl'))
-  joblib.dump(classifier, os.path.join(args.dir_inputs, f'classifier_{args.mse_thresh}_class.pkl'))
-  joblib.dump(img_name_high, os.path.join(args.dir_inputs, f'img_names_high_{args.mse_thresh}_class.pkl'))
+
+
+  classifier, boundary = train_boundary(latent_codes_np_high, np.array(labels_high), split_ratio= 0.7)
+
+  joblib.dump(boundary, os.path.join(args.dir_inputs, f'boundary_{args.mse_thresh}.pkl'))
+  joblib.dump(classifier, os.path.join(args.dir_inputs, f'classifier_{args.mse_thresh}.pkl'))
+  joblib.dump(img_name_high, os.path.join(args.dir_inputs, f'img_names_high_{args.mse_thresh}.pkl'))
  
 
 if __name__=="__main__":
