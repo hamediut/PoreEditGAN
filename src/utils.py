@@ -157,3 +157,6 @@ def train_boundary(latent_codes, labels, split_ratio = 0.7):
     print(f'Shape of boundary: {boundary.shape}')
     
     return classifier, boundary
+
+###--------------------------------------------layer-wise manipulation-----------------------------
+
