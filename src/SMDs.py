@@ -530,4 +530,41 @@ def calculate_polytopes(images, par, outputPn, cpathPn, runtimePn, polytope= 's2
             
     for filename in glob(outputPn + '/batch*'):
             os.remove(filename) 
- 
+
+
+###-------Omega
+def omega_n(polytope:List[np.ndarray],
+            delta_time:tuple =None):
+    """delta_time: tuple showing the first and last time step. e.g., (0,10)--> t0, t10"""
+    polytope =np.nan_to_num(polytope) # Convert Nan values to 0
+    
+    if not delta_time:
+        delta_time = list(range(0, len(polytope)))
+    else:
+        delta_time = list(range(delta_time[0], delta_time[1]))
+    
+    # N(L)--> number of different sized polytopes which will be number of r??
+    # for example if image size = 512, we have 256 rs--> N(L) = 256
+    # the function for calculating s2 is different than higher-order functions.
+     # s2 input is a list of length= number of timesteps
+    # each s2 in the list is a 1D vector of s2 values with length of r (Nl)
+    omega_list = []
+    if polytope[-1].ndim ==1:
+        N_L= 1/ len(polytope[-1])
+        for time in delta_time:
+            if type(polytope[time]) == int and polytope[time] == 0:
+                omega = 0
+            else:
+                omega =np.linalg.norm(polytope[time]-polytope[0], ord =1) # L1_norm
+            omega_t = N_L* omega
+            omega_list.append(omega_t)
+        
+    elif polytope[0].ndim == 2:
+        N_L = 1/len(polytope[0][:, 0])
+        
+        for time in delta_time:
+            omega =np.linalg.norm(polytope[time][:, 1]-polytope[0][:, 1], ord =1) # L1_norm
+            omega_t = N_L* omega
+            omega_list.append(omega_t)
+
+    return omega_list
