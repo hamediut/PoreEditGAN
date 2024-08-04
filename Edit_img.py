@@ -79,14 +79,14 @@ def connect_pores():
     print(f'Predicted label for image{os.path.splitext(img_name)[0]}: {label_pred}')
   
     ## steps in latent space
-    start_distance = 0
-    end_distance = 20
-    steps = 10
+    start_distance = -20 #originally 0
+    end_distance = 50 # originally 20
+    steps = 15 #originally 10
     linspace1 = np.linspace(start_distance, end_distance, steps)
     linspace1 = linspace1 - code.dot(boundary.T)
 
-    start_distance = 21
-    end_distance = 70 #50
+    start_distance = 51 # originally 21
+    end_distance = 100 #70 #50
     steps = 70
     linspace2 = np.linspace(start_distance, end_distance, steps)
     linspace2 = linspace2 - code.dot(boundary.T)
