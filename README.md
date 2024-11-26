@@ -1,1 +1,2 @@
 ## PoreEditGAN
+This repository provides codes for editing pores using the latent space of pre-trained GANs. It also contains the code for characterising the pore networks using spatial correlation functions. There are two papers related to this Github page which has not been yet submitted. The link to the papers will be provided when the pre-print versions are out. This project is part of my PhD at Utrecht University, funded by European Reseach Councoul (ERC) starting grant 'nanoEARTH' ($\#$852069).
