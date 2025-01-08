@@ -13,8 +13,10 @@ Here, we use a hybrid method consisting method consisting training an Encoder an
 
 
 ## Usage
+Here you can find some guidelines and example to run the scripts for microstructure characterisation using Statistical microstructure descriptors (SMDs) and editing the pores using our trained models.
+The codes here are for images of size 512 by 512 pixels. For smaller images (256 by 256), see the branch ``feature-res256``.
 ### Overview
 
-There several scripts that need to be run in order for editing an image. Here is a summary of scripts.
+Here is the summary of scripts in this repository:
 
 - ``SMDs.py``: Computes Statistical microstructure descriptors (SMDs) in each image.
