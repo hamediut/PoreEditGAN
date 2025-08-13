@@ -1,5 +1,7 @@
-## PoreEditGAN
-This repository provides codes for editing pores using the latent space of pre-trained GANs. It also contains the code for characterising the pore networks using spatial correlation functions. There are two papers related to this Github page which has not been yet submitted. The link to the papers will be provided when the pre-print versions are out. This project is part of my PhD at Utrecht University, funded by European Reseach Councoul (ERC) starting grant 'nanoEARTH' (#852069).
+# Microstructure characterisation using SMDs
+⚠️ **Work in Progress**: This branch is under active development. Code and documentation are being updated regularly.
+git a
+This branch contains codes, data, and documentation for **part 1** of the paper *"Transient porosity during fluid-mineral interaction. Part 1: In-situ 4D tomography"*. It involves codes for characterising microstructures using statistical microstructure descriptors (SMDs) and Minkowskie functionals (MFs). Both parts have been recently submitted to JGR: Solid Earth. The link to the papers will be provided when the pre-print versions are out. This project is part of my PhD at Utrecht University, funded by European Reseach Councoul (ERC) starting grant 'nanoEARTH' (#852069).
 
 To edit an image, a few steps should be taken in order. Here is the summary of these steps (more details can be found in the our paper):
 
