@@ -18,11 +18,10 @@ def two_point_correlation(im, dim, var=0):
     
     dim = 0: x-direction
     dim = 1: y-direction
-    dim = 2: z-direction
     
     var should be set to the pixel value of the pore-space. (Default 0)
     
-    The input image im is expected to be three-dimensional.
+    The input image im is expected to be two-dimensional.
     """
     if dim == 0: #x_direction
         dim_1 = im.shape[1] #y-axis
@@ -61,7 +60,8 @@ def calculate_smd_list(images):
             two_pt_dim1 = two_point_correlation(images[i], dim = 1, var = 1) #S2 in y-direction
 
             #Take average of directions; use half linear size assuming equal dimension sizes
-            Nr = two_pt_dim0.shape[0]//2
+            # Nr = two_pt_dim0.shape[0]//2
+            Nr = min(images.shape[1], images.shape[2])//2 # this works if the image dimension is different in x and y, it takes the smallest
 
             S2_x = np.average(two_pt_dim1, axis=0)[:Nr]
             S2_y = np.average(two_pt_dim0, axis=0)[:Nr]
@@ -83,7 +83,8 @@ def calculate_smd_list(images):
         two_pt_dim1 = two_point_correlation(images, dim = 1, var = 1) #S2 in y-direction
 
         #Take average of directions; use half linear size assuming equal dimension sizes
-        Nr = two_pt_dim0.shape[0]//2
+        # Nr = two_pt_dim0.shape[0]//2
+        Nr = min(images.shape)//2
 
         S2_x = np.average(two_pt_dim1, axis=0)[:Nr]
         S2_y = np.average(two_pt_dim0, axis=0)[:Nr]
