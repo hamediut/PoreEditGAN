@@ -14,14 +14,6 @@ Output:
 This script saves a dictionary for each image in the output folder specified by user.
 In each dictionary, the polytope functions (s2, p3, p4, ..L, f2, f3, f4, fL) are the keys and values are the probabilities at each distance r.
 See the jupyter notebook "polytopes_example.ipynb" for examples of plotting SMDs after running this script.
-
-Usage:
-
-python calculate_SMD.py --path_input "C:\Users\David\OneDrive - Universiteit Utrecht\My PhD\My papers\2ndPaper_4Dimages\Part1_chapter
-3\Data_ForGithub\Fig04\Fig04a\img_xy_slice_100.tif" --cpathPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\Cpp_source\Polytope" --runtimePn "D:\Hamed\PoreEditGAN_github
-\cpp_poly\512\runtime" --outputPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime\output" --path_output "C:\Users\David\OneDrive - Universiteit Utrecht\My PhD\My p
-apers\2ndPaper_4Dimages\Part1_chapter3\Data_ForGithub\Fig04\Fig04a"
-
 """
 
 import os
@@ -62,7 +54,7 @@ def quantify_imgs():
     args = parse_args()
 
     img = tifffile.imread(os.path.join(args.path_input)).astype(np.uint8)
-    img = img[-1, :, :] # just to test the code
+    # img = img[::10, :, :] # just to test the code
     print(f'Image shape: {img.shape}')
     min_img_size = min(img.shape[1], img.shape[2]) if img.ndim ==3 else min(img.shape)
 

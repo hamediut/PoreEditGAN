@@ -31,14 +31,12 @@ After this, you should compile the file and remove the .exe from the file name t
 After compiling the cpp code. you can run the following command to compute SMDs for your 2D image(s). The input can be a single 2D tif image or a number of 2D slices stacked as an 3D tif image of shape (num_slice, W, H) as in our case. 
 
 **Example:**
-```bash
-python calculate_SMD.py \
---path_input "Dataset\imgs_512\img_xy_slice_100.tif" \
---cpathPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\Cpp_source\Polytope" \
---runtimePn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime" \
---outputPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime\output"\
---path_output "Results\imgs_512"
+```powershell
+python calculate_SMD.py --path_input "Dataset\imgs_512\img_xy_slice_100.tif" --cpathPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\Cpp_source\Polytope" --runtimePn "D:\Hamed\PoreEditGAN_github
+\cpp_poly\512\runtime" --outputPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime\output" --path_output "Results\imgs_512"
 ```
+python calculate_SMD.py --path_input "C:\path\to\image.tif" --cpathPn "D:\path\to\Polytope" --runtimePn "D:\path\to\runtime" --outputPn "D:\path\to\runtime\output" --path_output "C:\path\to\output"
+
 Arguments:
 Here are arguments that should be passed when running the above code:
 `--path_input`:  full path tp your tif image.
