@@ -9,6 +9,7 @@ if you have images of different size, you should do the following changes in cpp
 #define MAXX 513 --> change this to your image_size + 1 (e.g., for image size of 256, it should be 257)
 #define Nt 256 --> change this to half of you image size (e.g., for image size of 256, it should be 128)
 
+
 Output:
 This script saves a dictionary for each image in the output folder specified by user.
 In each dictionary, the polytope functions (s2, p3, p4, ..L, f2, f3, f4, fL) are the keys and values are the probabilities at each distance r.
