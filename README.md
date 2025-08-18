@@ -37,13 +37,13 @@ python calculate_SMD.py --path_input "Dataset\imgs_512\img_xy_slice_100.tif" --c
 ```
 python calculate_SMD.py --path_input "C:\path\to\image.tif" --cpathPn "D:\path\to\Polytope" --runtimePn "D:\path\to\runtime" --outputPn "D:\path\to\runtime\output" --path_output "C:\path\to\output"
 
-Arguments:
+**Arguments:**
 Here are arguments that should be passed when running the above code:
-`--path_input`:  full path tp your tif image.
-`--cpathPn`: path to Polytope folder in `cpp_poly\512\Cpp_source\Polytope`.
-`runtimePn`: path to runtime folder in `cpp_poly\512\runtime`.
-`outputPn`: path to output folder in runtime `cpp_poly\512\runtime\output`
-`path_output`: path to the output folder to save dictinary containing the SMDs as a `.pkl` file.
+- `--path_input`: full path tp your tif image.
+- `--cpathPn`: path to Polytope folder in `cpp_poly\512\Cpp_source\Polytope`.
+- `runtimePn`: path to runtime folder in `cpp_poly\512\runtime`.
+- `outputPn`: path to output folder in runtime `cpp_poly\512\runtime\output`
+- `path_output`: path to the output folder to save dictinary containing the SMDs as a `.pkl` file.
 
 
 
