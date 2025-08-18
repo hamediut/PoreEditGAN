@@ -1,5 +1,6 @@
-"""This script calculates two-point correlation function (S2) a single 3D binary image.
-The input image shhould be a 3D tiff image file with shape of (num_slice, W, H).
+"""This script calculates two-point correlation function (S2) in 4D i.e., for more than one 3D images.
+It get a path to folder where couple of 3D image with time exist.
+Each 3D image in the folder shhould be a 3D tiff image file with shape of (num_slice, W, H).
 
 Imges should be binary (0 and 1) with 1 for your feature of interest (e.g., pores or fractures).
 
@@ -7,8 +8,7 @@ Imges should be binary (0 and 1) with 1 for your feature of interest (e.g., pore
 
 
 Output:
-This script saves a dictionary (with default name of s2_3D.pkl) with 4 keys 'x', 'y', 'z', 'r'. The r is the average s2 in different directions.
-See the jupyter notebook 'polytopes_example' for plotting the results.
+This script saves a dictionary ...
 """
 
 import os
