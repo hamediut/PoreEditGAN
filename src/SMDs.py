@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from numba import jit
 from tqdm import tqdm
 from typing import Dict, List
@@ -6,6 +7,10 @@ import os
 import shutil
 import subprocess
 from glob import glob
+
+import joblib # for saving outputs
+import tifffile
+
 
 
 @jit 
@@ -532,7 +537,181 @@ def calculate_polytopes(images, par, outputPn, cpathPn, runtimePn, polytope= 's2
     for filename in glob(outputPn + '/batch*'):
             os.remove(filename) 
 
+##--------------------calculating s2 and f2 in 4D (3D images with time)
 
+@jit
+def two_point_correlation3D(im, dim, var=1):
+    """
+    This method computes the two point correlation,
+    also known as second order moment,
+    for a segmented binary image in the three principal directions.
+    
+    dim = 0: x-direction
+    dim = 1: y-direction
+    dim = 2: z-direction
+    
+    var should be set to the pixel value of the pore-space. (Default 1)
+    
+    The input image im is expected to be three-dimensional.
+    """
+    if dim == 0: #x_direction
+        dim_1 = im.shape[2] #y-axis
+        dim_2 = im.shape[1] #z-axis
+        dim_3 = im.shape[0] #x-axis
+    elif dim == 1: #y-direction
+        dim_1 = im.shape[0] #x-axis
+        dim_2 = im.shape[1] #z-axis
+        dim_3 = im.shape[2] #y-axis
+    elif dim == 2: #z-direction
+        dim_1 = im.shape[0] #x-axis
+        dim_2 = im.shape[2] #y-axis
+        dim_3 = im.shape[1] #z-axis
+        
+    two_point = np.zeros((dim_1, dim_2, dim_3))
+    for n1 in range(dim_1):
+        for n2 in range(dim_2):
+            for r in range(dim_3):
+                lmax = dim_3-r
+                for a in range(lmax):
+                    if dim == 0:
+                        pixel1 = im[a, n2, n1]
+                        pixel2 = im[a+r, n2, n1]
+                    elif dim == 1:
+                        pixel1 = im[n1, n2, a]
+                        pixel2 = im[n1, n2, a+r]
+                    elif dim == 2:
+                        pixel1 = im[n1, a, n2]
+                        pixel2 = im[n1, a+r, n2]
+                    
+                    if pixel1 == var and pixel2 == var:
+                        two_point[n1, n2, r] += 1
+                two_point[n1, n2, r] = two_point[n1, n2, r]/(float(lmax))
+    return two_point
+
+def calculate_two_point_3D(images):
+    """
+    This function calculates average directional two-point correlations in x,y, and z from batch images with shape: (batch_size, image_size, image_size, image_size) and convert them to dataframe.
+    Input is a 4D numpy array. so if you run it on a pytorch tensor, tensors should be first converted into numpy by : tensor_image.detach().cpu().numpy()[:, 0, :, :, :]. 0 is for image channel.
+    
+    Returns:
+    4 grouped dataframes containing average s2, std, and number of images in x, y, and z-directions, as well as
+    the average s2(r) in 3D dimensions, respectively.
+    """
+    
+    
+    
+#     print(len(images.shape))
+    if len(images.shape) == 3:
+        # only 1 3D image
+#         Nr = min(images.shape) # min of shape, in case of non-cubic images (x=266, y = 512, z= 512)
+        
+        two_point_covariance = {}
+        for j, direc in tqdm(enumerate( ["x", "y", "z"]) ):
+            two_point_direc =  two_point_correlation3D(images, dim = j, var = 1)
+            two_point_covariance[direc] = two_point_direc
+#         Nr = two_point_covariance[direc].shape[0]// 2
+
+        direc_covariances = {}
+        for direc in ["x", "y", "z"]:
+            direc_covariances[direc] =  np.mean(np.mean(two_point_covariance[direc], axis=0), axis=0)
+        
+#         average_yz = ( np.array(direc_covariances['y']) + np.array(direc_covariances['z']) )/2
+        return np.array(direc_covariances['x']), np.array(direc_covariances['y']), np.array(direc_covariances['z'])
+    
+    
+    
+    
+    elif len(images.shape) == 4:
+        s2_list_x = []
+        s2_list_y = []
+        s2_list_z = []
+
+
+        for i in tqdm( range(images.shape[0]) ):
+            # 1) convert each image in the batch to microstructure
+            # 2) calculate the requested polytope function including scaled version
+            # 3) append the results to the empty list above
+
+            two_point_covariance = {}
+            for j, direc in enumerate(["x", "y", "z"]) :
+                two_point_direc = two_point_correlation3D(images[i], j, var = 1)
+                two_point_covariance[direc] = two_point_direc
+
+            Nr = two_point_covariance[direc].shape[0]// 2
+            direc_covariances = {}
+            for direc in ["x", "y", "z"]:
+                direc_covariances[direc] = np.mean(np.mean(two_point_covariance[direc], axis=0), axis=0)[: Nr]
+
+            s2_list_x.append(direc_covariances['x'])
+            s2_list_y.append(direc_covariances['y'])
+            s2_list_z.append(direc_covariances['z'])
+
+
+
+        # x-direction--------------------
+        df_list_x = []
+        for k in np.arange(0, len(s2_list_x)):
+            df_list_x.append(pd.DataFrame(s2_list_x[k], columns = ['s2']))
+        df_x = pd.concat(df_list_x)
+        df_x['r'] = df_x.index
+        df_x_grouped = df_x.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
+
+        # y-direction--------------------
+        df_list_y = []
+        for k in np.arange(0, len(s2_list_y)):
+            df_list_y.append(pd.DataFrame(s2_list_y[k], columns = ['s2']))
+        df_y = pd.concat(df_list_y)
+        df_y['r'] = df_y.index
+        df_y_grouped = df_y.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
+
+        # z-direction--------------------
+        df_list_z = []
+        for k in np.arange(0, len(s2_list_z)):
+            df_list_z.append(pd.DataFrame(s2_list_z[k], columns = ['s2']))
+        df_z = pd.concat(df_list_z)
+        df_z['r'] = df_z.index
+        df_z_grouped = df_z.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
+
+        return df_x_grouped, df_y_grouped, df_z_grouped, (df_x_grouped +  df_y_grouped + df_z_grouped)/3
+
+def s2_3D_time(path_to_stacks, start_from, output_path):
+    s2_3D_dic_x = {}
+    s2_3D_dic_y = {}
+    s2_3D_dic_z = {}
+#     s2_3D_dic_avg_yz = {}
+    
+    exp_name = os.listdir(path_to_stacks)[0].split('_')[1]
+    for idx, file in tqdm(enumerate(os.listdir(path_to_stacks))):
+        stack_num = file.split('_')[2]
+        if idx < start_from:
+            s2_3D_dic_x[f'{exp_name}_{stack_num}'] = 0
+            s2_3D_dic_y[f'{exp_name}_{stack_num}'] = 0
+            s2_3D_dic_z[f'{exp_name}_{stack_num}'] = 0
+#             s2_3D_dic_avg_yz[f'{exp_name}_{stack_num}'] = 0
+        else:
+            img = tifffile.imread(os.path.join(path_to_stacks, file)).astype(np.uint8)
+            s2_3D_x, s2_3D_y, s2_3D_z = calculate_two_point_3D(img)
+            s2_3D_dic_x[f'{exp_name}_{stack_num}'] = s2_3D_x
+            s2_3D_dic_y[f'{exp_name}_{stack_num}'] = s2_3D_y
+            s2_3D_dic_z[f'{exp_name}_{stack_num}'] = s2_3D_z
+#             s2_3D_dic_avg_yz[f'{exp_name}_{stack_num}'] = s2_3D_avg_yz
+            
+        if idx > 0 and idx % 100 ==0:
+            
+            # I stick to the same convension I have used for other polytopes.
+            # z--> slices in the stacks == x in two-point correlation functions
+#             joblib.dump(s2_3D_dic_x, os.path.join(output_path, f's2_3D_dict_z_{exp_name}.pkl'))
+#             joblib.dump(s2_3D_dic_avg_yz, os.path.join(output_path, f's2_3D_dict_xy_{exp_name}.pkl'))
+            joblib.dump(s2_3D_dic_x, os.path.join(output_path, f's2_3D_dict_x_{exp_name}.pkl'))
+            joblib.dump(s2_3D_dic_y, os.path.join(output_path, f's2_3D_dict_y_{exp_name}.pkl'))
+            joblib.dump(s2_3D_dic_z, os.path.join(output_path, f's2_3D_dict_z_{exp_name}.pkl'))
+    
+#     joblib.dump(s2_3D_dic_x, os.path.join(output_path, f's2_3D_dict_z_{exp_name}.pkl'))                    
+#     joblib.dump(s2_3D_dic_avg_yz, os.path.join(output_path, f's2_3D_dict_xy_{exp_name}.pkl'))
+    joblib.dump(s2_3D_dic_x, os.path.join(output_path, f's2_3D_dict_x_{exp_name}.pkl'))
+    joblib.dump(s2_3D_dic_y, os.path.join(output_path, f's2_3D_dict_y_{exp_name}.pkl'))
+    joblib.dump(s2_3D_dic_z, os.path.join(output_path, f's2_3D_dict_z_{exp_name}.pkl'))
+    return s2_3D_dic_x, s2_3D_dic_y, s2_3D_dic_z
 ###-------Omega
 def omega_n(polytope:List[np.ndarray],
             delta_time:tuple =None):
