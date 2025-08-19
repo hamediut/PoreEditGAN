@@ -601,78 +601,81 @@ def calculate_two_point_3D(images):
     
     
 #     print(len(images.shape))
-    if len(images.shape) == 3:
+    # if len(images.shape) == 3:
         # only 1 3D image
-#         Nr = min(images.shape) # min of shape, in case of non-cubic images (x=266, y = 512, z= 512)
+    Nr = min(images.shape) # min of shape, in case of non-cubic images (x=266, y = 512, z= 512)
         
-        two_point_covariance = {}
-        for j, direc in tqdm(enumerate( ["x", "y", "z"]) ):
-            two_point_direc =  two_point_correlation3D(images, dim = j, var = 1)
-            two_point_covariance[direc] = two_point_direc
+    two_point_covariance = {}
+    for j, direc in tqdm(enumerate( ["x", "y", "z"]) ):
+        two_point_direc =  two_point_correlation3D(images, dim = j, var = 1)
+        two_point_covariance[direc] = two_point_direc
 #         Nr = two_point_covariance[direc].shape[0]// 2
 
-        direc_covariances = {}
-        for direc in ["x", "y", "z"]:
-            direc_covariances[direc] =  np.mean(np.mean(two_point_covariance[direc], axis=0), axis=0)
-        
+    direc_covariances = {}
+    for direc in ["x", "y", "z"]:
+        direc_covariances[direc] =  np.mean(np.mean(two_point_covariance[direc], axis=0), axis=0)[:Nr]
+
+    s2_r = (np.array(direc_covariances['x']) + np.array(direc_covariances['y']) + np.array(direc_covariances['z']) )/3
+
+    return s2_r
+    
 #         average_yz = ( np.array(direc_covariances['y']) + np.array(direc_covariances['z']) )/2
-        return np.array(direc_covariances['x']), np.array(direc_covariances['y']), np.array(direc_covariances['z'])
+    # return np.array(direc_covariances['x']), np.array(direc_covariances['y']), np.array(direc_covariances['z'])
     
+
     
-    
-    
-    elif len(images.shape) == 4:
-        s2_list_x = []
-        s2_list_y = []
-        s2_list_z = []
+    # elif len(images.shape) == 4:
+    #     s2_list_x = []
+    #     s2_list_y = []
+    #     s2_list_z = []
 
 
-        for i in tqdm( range(images.shape[0]) ):
-            # 1) convert each image in the batch to microstructure
-            # 2) calculate the requested polytope function including scaled version
-            # 3) append the results to the empty list above
+    #     for i in tqdm( range(images.shape[0]) ):
+    #         # 1) convert each image in the batch to microstructure
+    #         # 2) calculate the requested polytope function including scaled version
+    #         # 3) append the results to the empty list above
 
-            two_point_covariance = {}
-            for j, direc in enumerate(["x", "y", "z"]) :
-                two_point_direc = two_point_correlation3D(images[i], j, var = 1)
-                two_point_covariance[direc] = two_point_direc
+    #         two_point_covariance = {}
+    #         for j, direc in enumerate(["x", "y", "z"]) :
+    #             two_point_direc = two_point_correlation3D(images[i], j, var = 1)
+    #             two_point_covariance[direc] = two_point_direc
 
-            Nr = two_point_covariance[direc].shape[0]// 2
-            direc_covariances = {}
-            for direc in ["x", "y", "z"]:
-                direc_covariances[direc] = np.mean(np.mean(two_point_covariance[direc], axis=0), axis=0)[: Nr]
+    #         Nr = two_point_covariance[direc].shape[0]// 2
+    #         direc_covariances = {}
+    #         for direc in ["x", "y", "z"]:
+    #             direc_covariances[direc] = np.mean(np.mean(two_point_covariance[direc], axis=0), axis=0)[: Nr]
 
-            s2_list_x.append(direc_covariances['x'])
-            s2_list_y.append(direc_covariances['y'])
-            s2_list_z.append(direc_covariances['z'])
+    #         s2_list_x.append(direc_covariances['x'])
+    #         s2_list_y.append(direc_covariances['y'])
+    #         s2_list_z.append(direc_covariances['z'])
 
 
 
-        # x-direction--------------------
-        df_list_x = []
-        for k in np.arange(0, len(s2_list_x)):
-            df_list_x.append(pd.DataFrame(s2_list_x[k], columns = ['s2']))
-        df_x = pd.concat(df_list_x)
-        df_x['r'] = df_x.index
-        df_x_grouped = df_x.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
+    #     # x-direction--------------------
+    #     df_list_x = []
+    #     for k in np.arange(0, len(s2_list_x)):
+    #         df_list_x.append(pd.DataFrame(s2_list_x[k], columns = ['s2']))
+    #     df_x = pd.concat(df_list_x)
+    #     df_x['r'] = df_x.index
+    #     df_x_grouped = df_x.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
 
-        # y-direction--------------------
-        df_list_y = []
-        for k in np.arange(0, len(s2_list_y)):
-            df_list_y.append(pd.DataFrame(s2_list_y[k], columns = ['s2']))
-        df_y = pd.concat(df_list_y)
-        df_y['r'] = df_y.index
-        df_y_grouped = df_y.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
+    #     # y-direction--------------------
+    #     df_list_y = []
+    #     for k in np.arange(0, len(s2_list_y)):
+    #         df_list_y.append(pd.DataFrame(s2_list_y[k], columns = ['s2']))
+    #     df_y = pd.concat(df_list_y)
+    #     df_y['r'] = df_y.index
+    #     df_y_grouped = df_y.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
 
-        # z-direction--------------------
-        df_list_z = []
-        for k in np.arange(0, len(s2_list_z)):
-            df_list_z.append(pd.DataFrame(s2_list_z[k], columns = ['s2']))
-        df_z = pd.concat(df_list_z)
-        df_z['r'] = df_z.index
-        df_z_grouped = df_z.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
+    #     # z-direction--------------------
+    #     df_list_z = []
+    #     for k in np.arange(0, len(s2_list_z)):
+    #         df_list_z.append(pd.DataFrame(s2_list_z[k], columns = ['s2']))
+    #     df_z = pd.concat(df_list_z)
+    #     df_z['r'] = df_z.index
+    #     df_z_grouped = df_z.groupby(['r']).agg( {'s2': [np.mean, np.std, np.size] } )
 
-        return df_x_grouped, df_y_grouped, df_z_grouped, (df_x_grouped +  df_y_grouped + df_z_grouped)/3
+    #     return df_x_grouped, df_y_grouped, df_z_grouped, (df_x_grouped +  df_y_grouped + df_z_grouped)/3
 
 def s2_3D_time(path_to_stacks, start_from, output_path):
     s2_3D_dic_x = {}
@@ -713,6 +716,15 @@ def s2_3D_time(path_to_stacks, start_from, output_path):
     joblib.dump(s2_3D_dic_z, os.path.join(output_path, f's2_3D_dict_z_{exp_name}.pkl'))
     return s2_3D_dic_x, s2_3D_dic_y, s2_3D_dic_z
 ###-------Omega
+
+def cal_fn( polytope, n):
+    """This function calculates scaled autocovariance function from Pn function.
+    polytope:polytope function
+    n: order of polytope e.g., n= 3 for p3h and p3v"""
+    numerator = polytope - polytope[0] ** n
+    denominator = polytope[0] - polytope[0] ** n
+    fn_r = numerator/ denominator
+    return fn_r
 def omega_n(polytope:List[np.ndarray],
             delta_time:tuple =None):
     """delta_time: tuple showing the first and last time step. e.g., (0,10)--> t0, t10"""

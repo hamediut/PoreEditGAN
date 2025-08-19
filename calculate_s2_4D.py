@@ -18,7 +18,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import random
-from src.SMDs import two_point_correlation3D
+from src.SMDs import two_point_correlation3D, calculate_two_point_3D, cal_fn, omega_n
 
 import tifffile
 
@@ -30,49 +30,51 @@ np.random.seed(SEED)
 def parse_args():
   """Parses arguments."""
   parser = argparse.ArgumentParser()
-  parser.add_argument('--path_input', required= True, type=str,
-                       help='Full path to the image. ')
-  parser.add_argument('--path_output', type =str, help= 'Path to the output folder to save dictinary containing the S2 in different directions')
+  parser.add_argument('--path_folder', required= True, type=str,
+                       help='Path to the folder containing 3D images acquired in different time')
+  parser.add_argument('--first_stack_number', type =int, default=45, help = 'The fist stack number to start from. Default value is for exp7 (Exp.1 in the paper)')
+  parser.add_argument('--path_output', type =str, help= 'Path to the output folder to save dictinary containing radial S2')
 
   return parser.parse_args()
 
-def S2_3d():
+def S2_4d():
   args  = parse_args()
 
-  img = tifffile.imread(os.path.join(args.path_input)).astype(np.uint8)
-  print(f'Image shape: {img.shape}')
+  s2_3D_dic_r = {}
+  f2_3D_dic_r = {}
 
-  if img.ndim != 3:
-    raise ValueError(
-      f"Image shape = {img.shape}"
-      f"but input image should be 3D"
-    )
+  # get the experiment name from the files in the folder.
+  # for example in my case the image names are like:
+  #Binary_KBr07_0001_f815_t1080_coordinates_541,575_size_512.tif
+  # where KBr07 is the experiment name and '0001' is stack number 
+  exp_name = os.listdir(args.path_folder)[0].split('_')[1]
+  if exp_name == 'KBr07':
+    first_scan = 67
+  elif exp_name == 'KBr011':
+    first_scan = 45
+  else:
+    first_scan = args.first_stack_number
+    print(f'using default value for computation: {first_scan}')
+  print(f'expeiment:{exp_name},  start computation from scan number {first_scan}')
+#   print(exp_name)
+  for idx, file in tqdm(enumerate(os.listdir(args.path_folder))):
+       stack_num = file.split('_')[2] # getting the stack number
+       if idx < first_scan:
+         s2_3D_dic_r[f'{exp_name}_{stack_num}'] = 0
+         f2_3D_dic_r[f'{exp_name}_{stack_num}'] = 0
+         print(f'stack number: {stack_num}')
+       else:
+         img = tifffile.imread(os.path.join(args.path_folder, file)).astype(np.uint8)
+         s2_3D_r = calculate_two_point_3D(img)
+         s2_3D_dic_r[f'{exp_name}_{stack_num}'] = s2_3D_r
+         f2_3D_dic_r[f'{exp_name}_{stack_num}'] = cal_fn(s2_3D_r, n=2)
+
+  joblib.dump(s2_3D_dic_r, os.path.join(args.path_output, 's2_3D_dic_r.pkl'))
+  joblib.dump(f2_3D_dic_r, os.path.join(args.path_output, 'f2_3D_dic_r.pkl'))
+
   
-  Nr = min(img.shape)//2 # min of shape, in case of non-cubic images (x=266, y = 512, z= 512)
-  two_point_covariance = {}
-  for j, direc in tqdm(enumerate( ["x", "y", "z"]) ):
-                     
-            two_point_direc =  two_point_correlation3D(img, dim = j, var = 1)
-            two_point_covariance[direc] = two_point_direc
-#         Nr = two_point_covariance[direc].shape[0]// 2
+  # calculating omega
 
-  direc_covariances = {}
-  for direc in ["x", "y", "z"]:
-            direc_covariances[direc] =  np.mean(np.mean(two_point_covariance[direc], axis=0), axis=0)[:Nr]
-        
-#   average_yz = ( np.array(direc_covariances['y']) + np.array(direc_covariances['z']) )/2
-  ## calculate radial S2 by averaging along x, y, z
-  s2_r = (np.array(direc_covariances['x']) + np.array(direc_covariances['y']) + np.array(direc_covariances['z']) )/3
-  ## put them all in a dictionary
-  s2_dict = {}
-  s2_dict['x'] = np.array(direc_covariances['x'])
-  s2_dict['y'] = np.array(direc_covariances['y'])
-  s2_dict['z'] = np.array(direc_covariances['z'])
-  s2_dict['r'] = s2_r
-
-  # save the dictionary in the output path
-  joblib.dump(s2_dict, os.path.join(args.path_output, 's2_3D.pkl'))
-#   return np.array(direc_covariances['x']), np.array(direc_covariances['y']), np.array(direc_covariances['z'])
 
 if __name__ == "__main__":
-  S2_3d()
+  S2_4d()
