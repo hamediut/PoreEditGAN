@@ -715,7 +715,6 @@ def s2_3D_time(path_to_stacks, start_from, output_path):
     joblib.dump(s2_3D_dic_y, os.path.join(output_path, f's2_3D_dict_y_{exp_name}.pkl'))
     joblib.dump(s2_3D_dic_z, os.path.join(output_path, f's2_3D_dict_z_{exp_name}.pkl'))
     return s2_3D_dic_x, s2_3D_dic_y, s2_3D_dic_z
-###-------Omega
 
 def cal_fn( polytope, n):
     """This function calculates scaled autocovariance function from Pn function.
@@ -725,6 +724,25 @@ def cal_fn( polytope, n):
     denominator = polytope[0] - polytope[0] ** n
     fn_r = numerator/ denominator
     return fn_r
+
+
+##-----------timelog
+def timelog_preprocessing(path_to_log):
+    
+    df_time = pd.read_fwf(path_to_log)
+    
+     # this makes the times in seconds 
+    times=[pd.Timestamp(t).timestamp() for t in df_time['End_time'].values]
+    # then we can subtract from initial time
+    delta_time = [s - times[0] for s in times] # in seconds
+    #delta_time show the time after begining of experiment in seconds
+
+    df_time['Reaction_time'] =  delta_time.copy()
+    df_time['Scanning_time'] = list(df_time['Reaction_time'].diff())
+    
+    return df_time
+
+###-------functions for calculating Omega metrics---------------------
 def omega_n(polytope:List[np.ndarray],
             delta_time:tuple =None):
     """delta_time: tuple showing the first and last time step. e.g., (0,10)--> t0, t10"""
@@ -756,6 +774,51 @@ def omega_n(polytope:List[np.ndarray],
         
         for time in delta_time:
             omega =np.linalg.norm(polytope[time][:, 1]-polytope[0][:, 1], ord =1) # L1_norm
+            omega_t = N_L* omega
+            omega_list.append(omega_t)
+
+    return omega_list
+
+## this is delta omega without absolute difference so it shows the negative change...
+def delta_omega(polytope, delta_time =None):
+    """delta_time: tuple showing the first and last time step. e.g., (0,10)--> t0, t10"""
+    polytope =np.nan_to_num(polytope) # Convert Nan values to 0
+    
+    if not delta_time:
+        delta_time = list(range(0, len(polytope)))
+    else:
+        delta_time = list(range(delta_time[0], delta_time[1]))
+    
+    # N(L)--> number of different sized polytopes which will be number of r??
+    # for example if image size = 512, we have 256 rs--> N(L) = 256
+    # the function for calculating s2 is different than higher-order functions.
+     # s2 input is a list of length= number of timesteps
+    # each s2 in the list is a 1D vector of s2 values with length of r (Nl)
+    omega_list = []
+    if polytope[-1].ndim ==1:
+        N_L= 1/ len(polytope[-1])
+        for idx, time in enumerate(delta_time):
+                       
+            if type(polytope[time]) != np.ndarray:
+                omega = 0
+            else:
+#                 omega = np.linalg.norm(polytope[time]-polytope[time -1], ord =1) #L1 norm absolute distance
+                omega = np.sum(polytope[time]-polytope[time -1]) # sum of distance
+#             if idx ==0:
+#                 omega =np.linalg.norm(polytope[time]-polytope[0], ord =1) # L1_norm
+#             else:
+#                 omega =np.linalg.norm(polytope[time]-polytope[time - 1], ord =1) # L1_norm
+                
+            omega_t = N_L* omega
+            omega_list.append(omega_t)
+        
+    elif polytope[0].ndim == 2:
+        N_L = 1/len(polytope[0][:, 0])
+        
+        for idx, time in enumerate(delta_time):
+#             omega=0 if idx ==0 else np.linalg.norm(polytope[time][:, 1]-polytope[time -1][:, 1], ord =1)
+            omega=0 if idx ==0 else np.sum(polytope[time][:, 1]-polytope[time -1][:, 1]) # sum of distance
+#             omega =np.linalg.norm(polytope[time][:, 1]-polytope[0][:, 1], ord =1) # L1_norm
             omega_t = N_L* omega
             omega_list.append(omega_t)
 
