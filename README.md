@@ -35,17 +35,36 @@ After compiling the cpp code. you can run the following command to compute SMDs 
 python calculate_SMD.py --path_input "Dataset\imgs_512\img_xy_slice_100.tif" --cpathPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\Cpp_source\Polytope" --runtimePn "D:\Hamed\PoreEditGAN_github
 \cpp_poly\512\runtime" --outputPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime\output" --path_output "Results\imgs_512"
 ```
-python calculate_SMD.py --path_input "C:\path\to\image.tif" --cpathPn "D:\path\to\Polytope" --runtimePn "D:\path\to\runtime" --outputPn "D:\path\to\runtime\output" --path_output "C:\path\to\output"
-
 **Arguments:**
 Here are arguments that should be passed when running the above code:
 - `--path_input`: full path tp your tif image.
 - `--cpathPn`: path to Polytope folder in `cpp_poly\512\Cpp_source\Polytope`.
-- `runtimePn`: path to runtime folder in `cpp_poly\512\runtime`.
-- `outputPn`: path to output folder in runtime `cpp_poly\512\runtime\output`
-- `path_output`: path to the output folder to save dictinary containing the SMDs as a `.pkl` file.
+- `--runtimePn`: path to runtime folder in `cpp_poly\512\runtime`.
+- `--outputPn`: path to output folder in runtime `cpp_poly\512\runtime\output`
+- `--path_output`: path to the output folder to save dictinary containing the SMDs as a `.pkl` file.
 
+### S2 for a single 3D image
+To calculate the S_2 and F_2 for a single 3D image, run:
+```powershell
+python calculate_S2_3D.py --path_input "D:\Hamed\PSI\Stacks3D\exp1\Binary_KBr07_0140_f815_t1080_coordinates_541,575_siz
+e_512.tif" --path_output "C:\path\to\output"
+```
+**Arguments:**
+Here are arguments that should be passed when running the above code:
+- `--path_input`: full path to your 3D tif image.
+- `--path_output`: path to the output folder to save dictinary containing the s2 in different directions and the radial one as a `s2_3D.pkl` file.
 
+### S2 for 4D images and Omega metric
+You can also compute S2 and F2 for a time-resolved 3D stacks (4D images) if you have saved them with sequential file names in a folder. For example, see the folder "Stacks3D\exp1" in the published dataset for exp1 in the paper. When you have your images properly in the folder, you can then run:
+```powershell
+python calculate_s2_4D.py --path_folder "D:\Hamed\PSI\Stacks3D\exp1" --path_timelog "D:\Hamed\PSI\TimeLogs\timeseries_exp1.log"--path_output "C:\path\to\output"
+```
+**Arguments:**
+Here are arguments that should be passed when running the above code:
+- `--path_folder`: path to the folder where you have a bunch of 3D tif images acquired at different times (4D dataset).
+- `--path_output`: path to the output folder to save the outputs.
+
+Outputs are two pickle files 's2_3D_dic_r.pkl' and 'f2_3D_dic_r.pkl' whose keys are the experiments'names and stack number. For instance, in our case 'KBr07_0001' means stack number 1 from experiment KBr07. The code takes the experiment name from what is between the first and second '_' in the file name (e.g., Binary_KBr07_0001_f815_t1080_coordinates_541,575_size_512.tif). So if you give smilar names to your images, you don't need to change the code. Otherwise, please modify the code to deal with that. The third output is a csv file 'df_{exp_nam}.csv', containing the time in out experiments and Omega metrics calculated from S2 and f2 functions in 3D that are in the pickle files. With Omega values and delta_omega values, you can then plot the evolution of microstructures as in Figure 8 in our paper (see also the jupyter notebook). 
 
 
 
