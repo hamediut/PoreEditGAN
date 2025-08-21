@@ -16,12 +16,11 @@ conda env create -f environment.yml -n smd_env
 conda activate smd_env
 ```
 
-## Input data and examples
-The segmented 4-D tomography dataset is available on Zenodo: 
+## Data availability
+The dataset for this project consists of segmented images and timelog data for the experiments are available on Zenodo: 
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16875392.svg)](https://doi.org/10.5281/zenodo.16875392)
 
-<!-- https://doi.org/10.5281/zenodo.16875392 -->
 
 
 ## Compile cpp code
