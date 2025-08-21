@@ -46,7 +46,7 @@ def parse_args():
   parser.add_argument('--cpathPn', type= str, required = True, help = 'path to polytope folder in cpp_source')
   parser.add_argument('--runtimePn', type= str, required = True, help = 'path to runtime folder in cpp_source')
   parser.add_argument('--outputPn', type= str, required = True, help = 'path to output folder in runtime')
-  parser.add_argument('--path_timelog', required= True, type = str, help = 'Full path to the timelog text file of the experiment.')
+  parser.add_argument('--path_timelog', type = str, help = 'Full path to the timelog text file of the experiment.')
 
 
   parser.add_argument('--path_output', type =str, help= 'Path to the output folder to save dictinary containing the SMDs')

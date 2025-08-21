@@ -17,7 +17,10 @@ conda activate smd_env
 ```
 
 ## Input data and examples
-Here, I provide input data which are the images used in the part 1 of the paper. The raw data are segmented images and can be accessed through Zenodo repository that will be provided soon here.
+The segmented 4-D tomography dataset is available on Zenodo: 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16875392.svg)](https://doi.org/10.5281/zenodo.16875392)
+
+<!-- https://doi.org/10.5281/zenodo.16875392 -->
 
 
 ## Compile cpp code
@@ -38,7 +41,7 @@ python calculate_SMD.py --path_input "C:\Users\David\OneDrive - Universiteit Utr
 The script outputs a dictionary file ('SMDs.pkl') containing the SMDs for each slice (image at different times) in your 3D tif or for only one image if your input image is a single 2D tif image. If multiple images provided, then you will have another dictionary for Omega values, saved as 'omega_SMDs.pkl'. If you run the code with our dataset and you give the path to the timelog, then the script gives a dataframe saved as 'df_SMDs_2D_omega.csv' with all the omega values at different columns, so you can then plot them versus time, as you can see in the jupyter notebook. If you use your own 2D images, you get the results as a dictionary 'omega_SMDs.pkl' in your output path.
 
 **Arguments:**
-Here are arguments that should be passed when running the above code:
+Here are arguments for the above script:
 - `--path_input`: full path tp your tif image.
 - `--cpathPn`: path to Polytope folder in `cpp_poly\512\Cpp_source\Polytope`.
 - `--runtimePn`: path to runtime folder in `cpp_poly\512\runtime`.
