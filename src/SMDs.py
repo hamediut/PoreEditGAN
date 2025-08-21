@@ -10,6 +10,8 @@ from glob import glob
 
 import joblib # for saving outputs
 import tifffile
+# for cluster function
+import GooseEYE
 
 
 
@@ -538,6 +540,37 @@ def calculate_polytopes(images, par, outputPn, cpathPn, runtimePn, polytope= 's2
             os.remove(filename) 
 
 ##--------------------calculating s2 and f2 in 4D (3D images with time)
+
+def calculate_cluster_fn(images, start_scan = 67):
+    Nr = min(images.shape[1:]) + 1
+    Nr_half = Nr//2
+#     print(f'images shape: {images.shape}')
+#     print(f'Nr = {Nr}')
+#     print(f'Nr_half = {Nr_half}')
+    if images.ndim ==3:
+        
+        cluster_fn_list = []    
+        for i in tqdm(range(images.shape[0])):
+            
+            if np.mean(images[i]) == 0 or i < start_scan: # e.g., if porosity ==0
+                cluster_fn_list.append(np.zeros((Nr_half +1,)))
+            else:
+                # cluster image into connected component
+                C = GooseEYE.clusters(images[i])
+                # # 2-point cluster function
+                C2 = GooseEYE.C2((Nr, Nr), C, C)
+                cluster_fn_list.append(C2[Nr_half][Nr_half:])
+                
+        return cluster_fn_list
+    
+    elif images.ndim == 2:
+        # cluster image into connected component
+        C = GooseEYE.clusters(images)
+        # # 2-point cluster function
+        C2 = GooseEYE.C2((Nr, Nr), C, C)
+        cluster_fn = C2[Nr_half][Nr_half:]
+         
+        return cluster_fn
 
 @jit
 def two_point_correlation3D(im, dim, var=1):
