@@ -35,8 +35,8 @@ def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('--path_folder', required= True, type=str,
                        help='Path to the folder containing 3D images acquired in different time')
-  parser.add_argument('--path_timelog', required= True, type = str, help = 'Full path to the timelog text file of the experiment.')
-  parser.add_argument('--first_stack_number', type =int, default=45, help = 'The fist stack number to start from. Default value is for exp7 (Exp.1 in the paper)')
+  parser.add_argument('--path_timelog', type = str, help = 'Full path to the timelog text file of the experiment.')
+  parser.add_argument('--first_stack_number', type =int, default=67, help = 'The fist stack number to start from. Default value is for exp7 (Exp.1 in the paper)')
   parser.add_argument('--path_output', type =str, help= 'Path to the output folder to save dictinary containing radial S2')
 
   return parser.parse_args()
@@ -68,7 +68,7 @@ def S2_4d():
        if idx < first_scan:
          s2_3D_dic_r[f'{exp_name}_{stack_num}'] = 0
          f2_3D_dic_r[f'{exp_name}_{stack_num}'] = 0
-         print(f'stack number: {stack_num}')
+        #  print(f'stack number: {stack_num}')
        else:
          img = tifffile.imread(os.path.join(args.path_folder, file)).astype(np.uint8)
          s2_3D_r = calculate_two_point_3D(img)
@@ -83,31 +83,56 @@ def S2_4d():
 #   f2_3D_dic_r = joblib.load(os.path.join(args.path_output, 'f2_3D_dic_r.pkl'))
 
   #------------------------------- calculating omega
-  ## for s2
-  omega_s2 = omega_n(polytope= list(s2_3D_dic_r.values()))
-  omega_del_s2 =  delta_omega(polytope= list(s2_3D_dic_r.values()))
+  ## we calculate omgea if there is more than one 3D image inside the path_folder
+  if len(os.listdir(args.path_folder)) > 1:
+    print('calculating omega metrics')
+    omega_dict = {}
+    
+    ## for s2
+    omega_dict['omega_s2_3d'] = omega_n(polytope= list(s2_3D_dic_r.values()))
+    omega_dict['delta_omega_s2_3d'] = delta_omega(polytope= list(s2_3D_dic_r.values()))
 
-  ##for f2
-  omega_f2 = omega_n(polytope= list(f2_3D_dic_r.values()))
-  omega_del_f2 =  delta_omega(polytope= list(f2_3D_dic_r.values()))
+    # for f2
+    omega_dict['omega_f2_3d'] = omega_n(polytope= list(f2_3D_dic_r.values()))
+    omega_dict['delta_omega_f2_3d'] = delta_omega(polytope= list(f2_3D_dic_r.values()))
+
+    # save the dictionary containing the omega values for each 3D image in the input folder
+    joblib.dump(omega_dict, os.path.join(args.path_output, 'omega_4D.pkl'))
+
+    if args.path_timelog is not None:#if there is a timelog file i.e., you're running the code to reproduce our results
+      timelog = timelog_preprocessing(args.path_timelog)
+
+      for key in list(omega_dict.keys()):
+        timelog[key] = omega_dict[key]
+    
+      file_suffix = 'Exp1' if exp_name == 'KBr07' else 'Exp2' if exp_name == 'KBr011' else 'Expn'
+      timelog.to_csv(os.path.join(args.path_output, f'df_{file_suffix}.csv'))
+            
+
+
+    
+    # omega_s2 = omega_n(polytope= list(s2_3D_dic_r.values()))
+    # omega_del_s2 =  delta_omega(polytope= list(s2_3D_dic_r.values()))
+    # omega_f2 = omega_n(polytope= list(f2_3D_dic_r.values()))
+    # omega_del_f2 =  delta_omega(polytope= list(f2_3D_dic_r.values()))
 
   ## put the results of omega in a dataframe with time
   ## load and process the timelog as a dataframe
-  timelog = timelog_preprocessing(args.path_timelog)
   
-  ## S2
-  timelog['omega_s2_3d'] =  omega_s2
-  timelog['delta_omega_s2_3d'] = omega_del_s2
   
-  ## F2
-  timelog['omega_f2_3d'] =  omega_f2
-  timelog['delta_omega_f2_3d'] = omega_del_f2
+#   ## S2
+#   timelog['omega_s2_3d'] =  omega_s2
+#   timelog['delta_omega_s2_3d'] = omega_del_s2
+  
+#   ## F2
+#   timelog['omega_f2_3d'] =  omega_f2
+#   timelog['delta_omega_f2_3d'] = omega_del_f2
 
 
-  ## saving the dataframe as a csv file
+#   ## saving the dataframe as a csv file
  
-  file_suffix = 'Exp1' if exp_name == 'KBr07' else 'Exp2' if exp_name == 'KBr011' else 'Expn'
-  timelog.to_csv(os.path.join(args.path_output, f'df_{file_suffix}.csv'))
+#   file_suffix = 'Exp1' if exp_name == 'KBr07' else 'Exp2' if exp_name == 'KBr011' else 'Expn'
+#   timelog.to_csv(os.path.join(args.path_output, f'df_{file_suffix}.csv'))
 
 
 if __name__ == "__main__":
