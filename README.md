@@ -24,7 +24,12 @@ The dataset for this project consists of segmented images and timelog data for t
 
 
 ## Compile cpp code
-First step to compute the SMDs is to compile cpp code based on the size of your image(s). The cpp code can be found in this repository in 'cpp_poly\512\Cpp_source\Polytope\Sample_Pn_UU.cpp'. In this script MAXX should be set to your image size +1 and NT to the half of your image size. For instance, if your image(s) are 512 by 512 pixels, then in cpp code you should set #define MAXX 513, and #define Nt 256. 
+The first step to compute the SMDs is to compile cpp code based on the size of your image(s). The cpp code can be found in 'cpp_poly\512\Cpp_source\Polytope\Sample_Pn_UU.cpp'. In this cpp code, `MAXX` should be set to your `image size +1` and `NT` to the `half of your image size`. For instance, if your image(s) have 512 by 512 pixels, then in cpp code you should set:
+
+```
+#define MAXX 513
+#define Nt 256.
+```
 
 After this, you should compile the file and remove the .exe from the file name to become 'Sample_Pn_UU'.
 
