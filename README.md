@@ -36,6 +36,7 @@ python calculate_SMD.py --path_input "C:\Users\David\OneDrive - Universiteit Utr
 ```
 
 The script outputs a dictionary file ('SMDs.pkl') containing the SMDs for each slice (image at different times) in your 3D tif or for only one image if your input image is a single 2D tif image. If multiple images provided, then you will have another dictionary for Omega values, saved as 'omega_SMDs.pkl'. If you run the code with our dataset and you give the path to the timelog, then the script gives a dataframe saved as 'df_SMDs_2D_omega.csv' with all the omega values at different columns, so you can then plot them versus time, as you can see in the jupyter notebook. If you use your own 2D images, you get the results as a dictionary 'omega_SMDs.pkl' in your output path.
+
 **Arguments:**
 Here are arguments that should be passed when running the above code:
 - `--path_input`: full path tp your tif image.
