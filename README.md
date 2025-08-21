@@ -27,20 +27,22 @@ After this, you should compile the file and remove the .exe from the file name t
 
 ## Usage
 
-### Calculate SMDs
-After compiling the cpp code. you can run the following command to compute SMDs for your 2D image(s). The input can be a single 2D tif image or a number of 2D slices stacked as an 3D tif image of shape (num_slice, W, H) as in our case. 
+### Calculate SMDs and Omega in 2D
+After compiling the cpp code. you can run the following command to compute SMDs for your 2D image(s). The input can be a single 2D tif image or a number of 2D slices stacked as an 3D tif image of shape (num_slice, W, H) as in our case. If you have only one single 2D image, then the scrit doesn't calculate Omega since you need at leat two image for the calculation (e.g., the reference image at t0 and another image at t1)
 
 **Example:**
 ```powershell
-python calculate_SMD.py --path_input "Dataset\imgs_512\img_xy_slice_100.tif" --cpathPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\Cpp_source\Polytope" --runtimePn "D:\Hamed\PoreEditGAN_github
-\cpp_poly\512\runtime" --outputPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime\output" --path_output "Results\imgs_512"
+python calculate_SMD.py --path_input "C:\Users\David\OneDrive - Universiteit Utrecht\My PhD\My papers\2ndPaper_4Dimages\Part1_chapter3\Data_ForGithub\Fig04\Fig04a\img_xy_slice_100.tif" --cpathPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\Cpp_source\Polytope" --runtimePn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime" --outputPn "D:\Hamed\PoreEditGAN_github\cpp_poly\512\runtime\output" --path_timelog "X:\Zeiss-Versa 610\Hamed\My papers\DataPublication\Part1\NewStructure\TimeLogs\timeseries_exp1.log" --path_output "C:\Users\David\OneDrive - Universiteit Utrecht\My PhD\My papers\2ndPaper_4Dimages\Part1_chapter3\Data_ForGithub\Fig04\Fig04a"
 ```
+
+The script outputs a dictionary file ('SMDs.pkl') containing the SMDs for each slice (image at different times) in your 3D tif or for only one image if your input image is a single 2D tif image. If multiple images provided, then you will have another dictionary for Omega values, saved as 'omega_SMDs.pkl'. If you run the code with our dataset and you give the path to the timelog, then the script gives a dataframe saved as 'df_SMDs_2D_omega.csv' with all the omega values at different columns, so you can then plot them versus time, as you can see in the jupyter notebook. If you use your own 2D images, you get the results as a dictionary 'omega_SMDs.pkl' in your output path.
 **Arguments:**
 Here are arguments that should be passed when running the above code:
 - `--path_input`: full path tp your tif image.
 - `--cpathPn`: path to Polytope folder in `cpp_poly\512\Cpp_source\Polytope`.
 - `--runtimePn`: path to runtime folder in `cpp_poly\512\runtime`.
 - `--outputPn`: path to output folder in runtime `cpp_poly\512\runtime\output`
+- `--path_timelog`: full path to the timelog text file of the experiment.
 - `--path_output`: path to the output folder to save dictinary containing the SMDs as a `.pkl` file.
 
 ### S2 for a single 3D image
@@ -62,6 +64,7 @@ python calculate_s2_4D.py --path_folder "D:\Hamed\PSI\Stacks3D\exp1" --path_time
 **Arguments:**
 Here are arguments that should be passed when running the above code:
 - `--path_folder`: path to the folder where you have a bunch of 3D tif images acquired at different times (4D dataset).
+- `--path_timelog`: full path to the timelog text file of the experiment.
 - `--path_output`: path to the output folder to save the outputs.
 
 Outputs are two pickle files 's2_3D_dic_r.pkl' and 'f2_3D_dic_r.pkl' whose keys are the experiments'names and stack number. For instance, in our case 'KBr07_0001' means stack number 1 from experiment KBr07. The code takes the experiment name from what is between the first and second '_' in the file name (e.g., Binary_KBr07_0001_f815_t1080_coordinates_541,575_size_512.tif). So if you give smilar names to your images, you don't need to change the code. Otherwise, please modify the code to deal with that. The third output is a csv file 'df_{exp_nam}.csv', containing the time in out experiments and Omega metrics calculated from S2 and f2 functions in 3D that are in the pickle files. With Omega values and delta_omega values, you can then plot the evolution of microstructures as in Figure 8 in our paper (see also the jupyter notebook). 
