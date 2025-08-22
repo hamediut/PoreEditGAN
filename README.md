@@ -1,10 +1,9 @@
 # Microstructure characterisation using SMDs
-⚠️ **Work in Progress**: This branch is under active development. Code and documentation are being updated regularly.
 
 This branch contains codes, data, and documentation for **part 1** of the paper *"Transient porosity during fluid-mineral interaction. Part 1: In-situ 4D tomography"*. It involves codes for characterising microstructures using statistical microstructure descriptors (SMDs) and Minkowskie functionals (MFs). Both parts have been recently submitted to JGR: Solid Earth. The link to the papers will be provided when the pre-print versions are out. This project is part of my PhD at Utrecht University, funded by European Reseach Councoul (ERC) starting grant 'nanoEARTH' (#852069).
 
 ## Overview
-- **Goal:** To characterise microstructures using statistical microstructure descriptors (SMDs) and minkowskie functionals.
+- **Goal:** To characterise microstructures using statistical microstructure descriptors (SMDs).
 - **Inputs:** 3D `.tif` stacks or 2D `.tif` slices.
 - **Outputs:** Dictionaries `.pkl` file containing the probabilities for each SMD, see the preprint for more details (link will be provided upon release). The jupyter notebook `polytopes_example.ipynb` shows an example of how to plot the SMDs from the output dictionary file.
 
