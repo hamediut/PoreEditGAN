@@ -1,4 +1,6 @@
-""""This script invert images onto the latent space of a trained generator using a pretrained encoder"""
+""""This script invert images onto the latent space of a trained generator using a pretrained generator and encoder.
+see the jupyter notebook 'InDStyleGAN2Inversion-MyImages_clean-new' in the stylegan3-main folder in David PC.
+"""
 
 import os
 import joblib
@@ -40,9 +42,10 @@ def parse_args():
 
     parser.add_argument('--dir_imgs', required = True, type = str,
                          help= 'path to the folder containing images to invert')
-    parser.add_argument('--G_pkl', required = True, help = 'Full path to the pre-trained Generator')
-    parser.add_argument('--E_pkl', required = True, help = 'Full path to the pre-trained Encoder')
-    
+    parser.add_argument('--path_G', required = True, help = 'Full path to the pre-trained Generator')
+    parser.add_argument('--path_E', required = True, help = 'Full path to the pre-trained Encoder')
+    parser.add_argument('--path_VGG', required= True, help = 'Full path to the pre-trained VGG model')
+
     parser.add_argument('--num_iter', type= int, default= 10000, help= 'Number of iteration to find the latent code')
     parser.add_argument('--lr', type = float, default = 0.05, help= 'learning rate for optimizer')
     parser.add_argument('--lr_decay_rate', type= float, default= 0.99, help= 'the degree of decaying learning rate')
@@ -53,7 +56,7 @@ def parse_args():
     parser.add_argument('--feat_w', type = float, default= 5e-5, help= 'The weight of perceptual term in the loss i.e., distance in the feature space')
     parser.add_argument('--reg_w', type = float, default= 0.1, help= 'The weight of regularization term in the loss')
     
-    ##thresholds to stop fne tuning the initial latent code from encoder
+    ##thresholds to stop fine tuning the initial latent code from encoder
     parser.add_argument('--mse_thresh', type= float, default= 3e-6,
                          help= 'Threshold for mse between s2 correlation function of real image and recon image')
     parser.add_argument('--pixel_thresh', type = float, default = 0.07)
@@ -67,19 +70,14 @@ def invert_imgs():
 
     device = 'cuda'
 
-    ## loading trained networks
+    ## loading pre-trained networks: Generator, Encoder, and VGG
 
+    ##Generator
     with dnnlib.util.open_url(args.G_pkl) as f:
         G_ema = legacy.load_network_pkl(f)['G_ema'].cuda().eval()
 
-    vgg_layer_idx = 23
-    VGG = PerceptualModel(output_layer_idx= vgg_layer_idx)
-    # with 30 layers: (b, c, 512, 512) --> (b,c, 32, 32)
-    ## for res =256:
-        # idx = 30 --> 16
-        # idx =23 --> 32
-        # idx =16--> 64
-    VGG.net.requires_grad_(False)
+    print(f'Loading generator from: {args.G_pkl}')
+
     ## Encoder-------
     Enc = StyleGANEncoderNet().to(device)
     print(f'Loading encoder from: {args.E_pkl}')
@@ -89,6 +87,18 @@ def invert_imgs():
     checkpoint= torch.load(args.E_pkl, map_location= torch.device(device))
     Enc.load_state_dict(checkpoint[f'enc_state_dict'])
     Enc.requires_grad_(False)
+
+    ## VGG network: feature extractor
+    
+    vgg_layer_idx = 23
+    VGG = PerceptualModel(output_layer_idx= vgg_layer_idx)
+    # with 30 layers: (b, c, 512, 512) --> (b,c, 32, 32)
+    ## for res =256:
+        # idx = 30 --> 16
+        # idx =23 --> 32
+        # idx =16--> 64
+    VGG.net.requires_grad_(False)
+    
     
     assert next(G_ema.parameters()).requires_grad == False
     assert next(VGG.net.parameters()).requires_grad == False
