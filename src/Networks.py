@@ -31,7 +31,9 @@ class StyleGANEncoderNet(nn.Module):
   """
 
   def __init__(self,
-               resolution = RESOLUTION,
+               
+              #  resolution = RESOLUTION,
+               resolution = None,
                w_space_dim=512,
                image_channels=1, 
                encoder_channels_base=64,
@@ -57,6 +59,8 @@ class StyleGANEncoderNet(nn.Module):
     """
     super().__init__()
 
+    if resolution is None:
+      resolution = RESOLUTION
     if resolution not in _RESOLUTIONS_ALLOWED:
       raise ValueError(f'Invalid resolution: {resolution}!\n'
                        f'Resolutions allowed: {_RESOLUTIONS_ALLOWED}.')
@@ -465,7 +469,7 @@ MAX_IMAGES_ON_RAM = 800
 class PerceptualModel(object):
   """Defines the perceptual model class."""
 
-  def __init__(self, output_layer_idx=23, min_val=-1.0, max_val=1.0):
+  def __init__(self, output_layer_idx=23, min_val=-1.0, max_val=1.0, weight_path= None):
     """Initializes."""
     self.use_cuda = USE_CUDA and torch.cuda.is_available()
     self.batch_size = MAX_IMAGES_ON_DEVICE
@@ -481,7 +485,11 @@ class PerceptualModel(object):
                      min_val=self.min_val,
                      max_val=self.max_val)
 
-    self.weight_path = _WEIGHT_PATH
+    #default to old _WEIGHT_PATH if not given
+    if weight_path is None:
+      weight_path =  _WEIGHT_PATH
+    self.weight_path = weight_path
+    # self.weight_path = _WEIGHT_PATH
 
     if not os.path.isfile(self.weight_path):
       raise IOError('No pre-trained weights found for perceptual model!')

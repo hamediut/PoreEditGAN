@@ -40,11 +40,13 @@ def parse_args():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dir_imgs', required = True, type = str,
-                         help= 'path to the folder containing images to invert')
+    parser.add_argument('--path_imgs', required = True, type = str, help= 'path to the folder containing images to invert')
     parser.add_argument('--path_G', required = True, help = 'Full path to the pre-trained Generator')
     parser.add_argument('--path_E', required = True, help = 'Full path to the pre-trained Encoder')
     parser.add_argument('--path_VGG', required= True, help = 'Full path to the pre-trained VGG model')
+    parser.add_argument('--vgg_layer_idx', type=int, default=23, help='Index of VGG16 layer for perceptual loss')
+
+    parser.add_argument('--res', type =int, default= 512, help= 'Image resolution. default = 512 by 512')
 
     parser.add_argument('--num_iter', type= int, default= 10000, help= 'Number of iteration to find the latent code')
     parser.add_argument('--lr', type = float, default = 0.05, help= 'learning rate for optimizer')
@@ -61,7 +63,7 @@ def parse_args():
                          help= 'Threshold for mse between s2 correlation function of real image and recon image')
     parser.add_argument('--pixel_thresh', type = float, default = 0.07)
 
-    parser.add_argument('--dir_output', type =str, required=True, help= 'Where to save latent codes')
+    parser.add_argument('--path_output', type =str, required=True, help= 'Where to save latent codes')
     return parser.parse_args()
 
 def invert_imgs():
@@ -73,25 +75,26 @@ def invert_imgs():
     ## loading pre-trained networks: Generator, Encoder, and VGG
 
     ##Generator
-    with dnnlib.util.open_url(args.G_pkl) as f:
+    with dnnlib.util.open_url(args.path_G) as f:
         G_ema = legacy.load_network_pkl(f)['G_ema'].cuda().eval()
 
-    print(f'Loading generator from: {args.G_pkl}')
+    print(f'Loading generator from: {args.path_G}')
 
     ## Encoder-------
-    Enc = StyleGANEncoderNet().to(device)
-    print(f'Loading encoder from: {args.E_pkl}')
+    Enc = StyleGANEncoderNet(resolution= args.res).to(device)
+    print(f'Loading encoder from: {args.path_E}')
     
     # loading the pretrained weights
     
-    checkpoint= torch.load(args.E_pkl, map_location= torch.device(device))
+    checkpoint= torch.load(args.path_E, map_location= torch.device(device))
     Enc.load_state_dict(checkpoint[f'enc_state_dict'])
     Enc.requires_grad_(False)
 
     ## VGG network: feature extractor
-    
-    vgg_layer_idx = 23
-    VGG = PerceptualModel(output_layer_idx= vgg_layer_idx)
+
+    # vgg_layer_idx = 23
+    print(f'loading the vgg weight from: {args.path_VGG}')
+    VGG = PerceptualModel(output_layer_idx= args.vgg_layer_idx, weight_path= args.path_VGG)
     # with 30 layers: (b, c, 512, 512) --> (b,c, 32, 32)
     ## for res =256:
         # idx = 30 --> 16
@@ -106,15 +109,17 @@ def invert_imgs():
 
     ##-------------------
     training_params = {
-      'Images path': args.dir_imgs, 'Output path': args.dir_output,
+      'Images path': args.path_imgs, 'Output path': args.path_output,
       'Initial lr': args.lr, 'Decay rate':args.lr_decay_rate,'Decay step':args.lr_decay_step,
       'Recon weight':args.recon_w, 'perceptual weight':args.feat_w, 'Regularization weight': args.reg_w,
-       'VGG layer index': vgg_layer_idx, 'MSE threshold': args.mse_thresh, 'pixel threshold': args.pixel_thresh,
+       'VGG layer index': args.vgg_layer_idx, 'MSE threshold': args.mse_thresh, 'pixel threshold': args.pixel_thresh,
 
       }
     
-    Logger(file_name=os.path.join(args.dir_output, 'log.txt'), file_mode='a', should_flush=True)
+    Logger(file_name=os.path.join(args.path_output, 'log.txt'), file_mode='a', should_flush=True)
     print(f'Training parameters: {training_params}')
+    
+    
     # training loop
 
     codes = {}
@@ -126,15 +131,15 @@ def invert_imgs():
 
     mse_list =[]
 
-    num_imgs = len(list(os.listdir(args.dir_imgs)))
+    num_imgs = len(list(os.listdir(args.path_imgs)))
 
-    for img_num, file in enumerate(list(os.listdir(args.dir_imgs))):
+    for img_num, file in enumerate(list(os.listdir(args.path_imgs))):
                         
             if os.path.splitext(file)[1] == '.png':
-                 img = np.array(PIL.Image.open(os.path.join(args.dir_imgs, file)))
+                 img = np.array(PIL.Image.open(os.path.join(args.path_imgs, file)))
             elif os.path.splitext(file)[1] == '.tif':
-                 img = tifffile.imread(os.path.join(args.dir_imgs, file))
-            # print(f'image shape = {img.shape}')
+                 img = tifffile.imread(os.path.join(args.path_imgs, file))
+            print(f'image shape = {img.shape}')
                  
                  
             mse = 1
@@ -142,9 +147,9 @@ def invert_imgs():
             
             # ## reading images...
             # if file.split('.')[1].lower() == 'png':
-            #     img = np.array(PIL.Image.open(os.path.join(args.dir_imgs, file)))
+            #     img = np.array(PIL.Image.open(os.path.join(args.path_imgs, file)))
             # elif file.split('.')[1].lower() == 'tif':
-            #     img = tifffile.imread(os.path.join(args.dir_imgs, file))
+            #     img = tifffile.imread(os.path.join(args.path_imgs, file))
 
             ##------------------------initial code---------
             real_tensor, init_code, init_recon = initial_code(img, Enc, G_ema)
