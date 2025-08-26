@@ -233,8 +233,8 @@ def invert_imgs():
                             break
                 
             if img_num > 0 and img_num % 50 ==0:
-                 joblib.dump(codes, os.path.join(args.path_output, 'latent_codes_TrainingImgs.pkl'))
-                 joblib.dump(viz_results, os.path.join(args.path_output, 'viz_results_TraininImgs.pkl'))
+                 joblib.dump(codes, os.path.join(args.path_output, 'latent_codes.pkl'))
+                #  joblib.dump(viz_results, os.path.join(args.path_output, 'viz_results_TraininImgs.pkl'))
 
 
 if __name__=='__main__':

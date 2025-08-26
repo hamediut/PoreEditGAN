@@ -30,6 +30,24 @@ To invert images into the latent space (W space) of the pre-trained generator, r
 
 **Example:**
 ```powershell
-python invert_imgs.py 
+python invert_imgs.py --path_imgs "Dataset\res512\labelled_images" --path_G "Dataset\res512\TrainedModels_res512\network-snapshot-009404.pkl" --path_E "Dataset\res512\TrainedModels_res512\Encoder_22200.pt" --path_VGG "Dataset\res512\TrainedModels_res512\vgg16.pth" --res 512 --path_output "Dataset\outputs" 
 ```
+
+The script's output is a dictionary file ('SMDs.pkl') containing the SMDs for each slice (image at different times) in your 3D tif or for only one image if your input image is a single 2D tif image. If multiple images provided, then you will have another dictionary for Omega values, saved as 'omega_SMDs.pkl'. If you run the code with our dataset and you give the path to the timelog, then the script gives a dataframe saved as 'df_SMDs_2D_omega.csv' with all the omega values at different columns, so you can then plot them versus time, as you can see in the jupyter notebook. If you use your own 2D images, you get the results as a dictionary 'omega_SMDs.pkl' in your output path.
+
+**Arguments:**
+Here are arguments for the above script:
+- `--path_input`: path to the folder of labelled images are, that is, the images you want to invert.
+- `--path_G`: full path to the pre-trained generator.
+- `--path_E`: full path to the pre-trained encoder.
+- `--path_VGG`: full path to the pre-trained VGG model.
+- `--res`: image resolution, default = 512
+- `--path_output`: path to the output folder to save dictinary containing inverted codes and the results of inversion.
+
+For other arguments see the docstring of the script.
+
+
+### Semantic direction
+Once the images are inverted and their corresponding latent codes obtained (see the previosu step). The semantic direction for editing the pore connecivity can be found by running the following:
+ 
 
