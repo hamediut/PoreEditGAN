@@ -61,7 +61,7 @@ def parse_args():
     ##thresholds to stop fine tuning the initial latent code from encoder
     parser.add_argument('--mse_thresh', type= float, default= 3e-6,
                          help= 'Threshold for mse between s2 correlation function of real image and recon image')
-    parser.add_argument('--pixel_thresh', type = float, default = 0.07)
+    parser.add_argument('--pixel_thresh', type = float, default = 0.1)
 
     parser.add_argument('--path_output', type =str, required=True, help= 'Where to save latent codes')
     return parser.parse_args()
@@ -139,7 +139,7 @@ def invert_imgs():
                  img = np.array(PIL.Image.open(os.path.join(args.path_imgs, file)))
             elif os.path.splitext(file)[1] == '.tif':
                  img = tifffile.imread(os.path.join(args.path_imgs, file))
-            print(f'image shape = {img.shape}')
+            # print(f'image shape = {img.shape}')
                  
                  
             mse = 1
@@ -197,7 +197,7 @@ def invert_imgs():
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                if step > 0 and step % args.lr_decay_step ==0:
+                if step > 0 and step % args.lr_decay_step == 0:
                     z_scheduler.step()
                 
                 ## calculate mse between s2 of real and recon imgs
@@ -227,15 +227,14 @@ def invert_imgs():
                             ax[1].imshow(viz_results[f'{os.path.splitext(file)[0]}'], cmap = 'gray')
                             ax[1].set_title('best recon')
                             fig.suptitle(f' Step = {step}, MSE = {mse:0.4e}, Pix_loss = {_get_tensor_value(loss_pix):.3f}')
-                            plt.savefig(os.path.join(args.dir_output, f'{os.path.splitext(file)[0]}.png'), dpi = 300)
+                            plt.savefig(os.path.join(args.path_output, f'{os.path.splitext(file)[0]}.png'), dpi = 300)
                             # plt.show()
 
                             break
                 
             if img_num > 0 and img_num % 50 ==0:
-                 joblib.dump(codes, os.path.join(args.dir_output, 'latent_codes_TrainingImgs.pkl'))
-                 joblib.dump(viz_results, os.path.join(args.dir_output, 'viz_results_TraininImgs.pkl'))
-
+                 joblib.dump(codes, os.path.join(args.path_output, 'latent_codes_TrainingImgs.pkl'))
+                 joblib.dump(viz_results, os.path.join(args.path_output, 'viz_results_TraininImgs.pkl'))
 
 
 if __name__=='__main__':
