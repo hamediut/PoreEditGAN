@@ -65,3 +65,22 @@ Here are arguments for the above script:
 
 The images for inversion have three labels: 0 for disconnected, 2 for connected, and 1 for the images in between. However, the same number of connected(2) and disconnected (0) labels are used to find the decision boundary using SVM approach.
 
+### Edit image
+After inverting the images and finding the decision boundary in the latent space (previous steps), then an image can be edited using pre-trained generator and the outputs of previous steps by running the foloowing:
+
+**Example:**
+```powershell
+python invert_imgs.py --path_latents "Dataset\res512\latent_codes.pkl" --path_boundary "Dataset\res512\boundary_1e-06_class.pkl" --path_classifier "Dataset\res512\classifier_1e-06_class.pkl"--path_G "Dataset\res512\TrainedModels_res512\network-snapshot-009404.pkl" --path_img "Dataset\imgs_512\Exp06_07_0036.tif" --path_output "Dataset\outputs"
+```
+
+**Arguments:**
+Here are arguments for the above script:
+- `--path_latents`: full path to the latent codes obtained from inverting image (latent_codes.pkl).
+- `--path_boundary`: full path to the boundary found in the previous step (*.pkl).
+- `--path_classifier`: full path to the trained SVM classifier found in the previous step (*.pkl).
+- `--path_img`: full path to the image you want to edit (tif or png file).
+- `--path_G`: full path to the pre-trained generator (network-snapshot-009404.pkl for res= 512). 
+- `--path_output`: path to the output folder to save the edited images.
+
+
+
