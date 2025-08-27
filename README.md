@@ -47,7 +47,21 @@ Here are arguments for the above script:
 For other arguments see the docstring of the script.
 
 
-### Semantic direction
-Once the images are inverted and their corresponding latent codes obtained (see the previosu step). The semantic direction for editing the pore connecivity can be found by running the following:
- 
+### Semantic boundary
+Once the images are inverted and their corresponding latent codes are obtained (see the previous step), the semantic boundary for editing the pore connecivity can be found by running the following:
+
+```powershell
+python find_boundary.py --path_log "Dataset\res512\log_all.txt" --path_labels "Dataset\res512\df_labels.csv" --path_latents "Dataset\res512\latent_codes.pkl" --path_output "Dataset\outputs"
+```
+
+**Arguments:**
+Here are arguments for the above script:
+- `--path_log`: full path to the log file created during inverting the images (log.txt).
+- `--path_labels`: full path to the labels (df_labels.csv) file in the dataset.
+- `--path_latents`: full path to the latent codes obtained from previosu step (latent_codes.pkl)
+- `--mse_thresh`: threshold for the mse between s2 of real image and reconstructed images, to only get the latent codes of high quality inversions. 
+- `--res`: image resolution, default = 512
+- `--path_output`: path to the output folder to save boundary and classifier.
+
+The images for inversion have three labels: 0 for disconnected, 2 for connected, and 1 for the images in between. However, the same number of connected(2) and disconnected (0) labels are used to find the decision boundary using SVM approach.
 
