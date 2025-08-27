@@ -20,16 +20,16 @@ def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('--path_log', required= True, type=str,
                        help='Full path to the log file for inverting images (the output of invert_imgs.py). ')
-  # parser.add_argument('--path_labels', required= True, type = str, help = 'Full path to the csv file containing image name and labels')
-  # parser.add_argument('--path_latents', required= True, type =str, help = 'Full path to the laten code file (.pkl)')
+  parser.add_argument('--path_labels', required= True, type = str, help = 'Full path to the csv file containing image name and labels')
+  parser.add_argument('--path_latents', required= True, type =str, help = 'Full path to the laten code file (.pkl)')
   
   parser.add_argument('--path_output', type =str, required=True, help= 'Where to save latent codes')
 
 
-  # parser.add_argument('--res', type=int, required= True, help='size of images')
+  parser.add_argument('--res', type=int, default= 512, help='size of images')
   
-  # parser.add_argument('--mse_thresh', type=float, default =1e-6,
-  #                       help='mse thrshold used to only get the latent codes of high quality inversions')
+  parser.add_argument('--mse_thresh', type=float, default =1e-6,
+                        help='mse thrshold used to only get the latent codes of high quality inversions')
 
 
 #   parser.add_argument('--RES', required= True, type = int,
@@ -76,25 +76,31 @@ def get_boundary():
         assert(len(value_list) == df_log.shape[0]) 
         df_log.loc[:, column] = value_list
 
-  # df_log.to_csv(os.path.join(args.path_output, 'df_log_clean_test.csv'))
+  # df_log.to_csv(os.path.join(args.path_output, 'df_log_clean_test.csv'), index = False)
   
 
-  # # df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))[:-1] # Remove the last row because there is no latent code for that image
-  # df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'labels.csv'))[:-1] # labels obtained from the classifier
-  # latent_codes_dict =  joblib.load(os.path.join(args.dir_inputs, 'latent_codes.pkl'))
+  # df_labels = pd.read_csv(os.path.join(args.dir_inputs, 'df_labels.csv'))[:-1] # Remove the last row because there is no latent code for that image
+  df_labels = pd.read_csv(args.path_labels)[:-1] # labels obtained from the classifier
+  print(df_labels.head())
+
+
+  latent_codes_dict =  joblib.load(args.path_latents)
   # df_log = pd.read_csv(os.path.join(args.dir_inputs, 'df_log_clean_all.csv'))
 
-  # img_name_high = get_img_name_high(df_log, mse_thresh= args.mse_thresh)
-  # # labels_high = [df_labels.loc[df_labels['img_name']== name, 'labels_3class'].values[0] for name in img_name_high]
+  img_name_high = get_img_name_high(df_log, mse_thresh= args.mse_thresh)
+  print(img_name_high)
+  print(len(img_name_high))
+  labels_high = [df_labels.loc[df_labels['img_name']== name, 'label'].values[0] for name in img_name_high]
+
   # labels_high = [df_labels.loc[df_labels['img_name']== name, 'preds_label'].values[0] for name in img_name_high] # with classifier
-  # # print(img_name_clean)
-  # latent_codes_high = get_codes_high(img_name_high, latent_codes_dict, res = args.res)
+  # print(img_name_clean)
+  latent_codes_high = get_codes_high(img_name_high, latent_codes_dict, res = args.res)
 
-  # classifier, boundary = train_boundary(latent_codes_high, np.array(labels_high), split_ratio= 0.7)
+  classifier, boundary = train_boundary(latent_codes_high, np.array(labels_high), split_ratio= 0.7)
 
-  # joblib.dump(boundary, os.path.join(args.dir_inputs, f'boundary_{args.mse_thresh}_class.pkl'))
-  # joblib.dump(classifier, os.path.join(args.dir_inputs, f'classifier_{args.mse_thresh}_class.pkl'))
-  # joblib.dump(img_name_high, os.path.join(args.dir_inputs, f'img_names_high_{args.mse_thresh}_class.pkl'))
+  joblib.dump(boundary, os.path.join(args.path_output, f'boundary_{args.mse_thresh}_class.pkl'))
+  joblib.dump(classifier, os.path.join(args.path_output, f'classifier_{args.mse_thresh}_class.pkl'))
+  joblib.dump(img_name_high, os.path.join(args.path_output, f'img_names_high_{args.mse_thresh}_class.pkl'))
  
 
 if __name__=="__main__":
