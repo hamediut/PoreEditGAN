@@ -98,9 +98,9 @@ def get_boundary():
 
   classifier, boundary = train_boundary(latent_codes_high, np.array(labels_high), split_ratio= 0.7)
 
-  joblib.dump(boundary, os.path.join(args.path_output, f'boundary_{args.mse_thresh}_class.pkl'))
-  joblib.dump(classifier, os.path.join(args.path_output, f'classifier_{args.mse_thresh}_class.pkl'))
-  joblib.dump(img_name_high, os.path.join(args.path_output, f'img_names_high_{args.mse_thresh}_class.pkl'))
+  joblib.dump(boundary, os.path.join(args.path_output, f'boundary.pkl'))
+  joblib.dump(classifier, os.path.join(args.path_output, f'classifier.pkl'))
+  # joblib.dump(img_name_high, os.path.join(args.path_output, f'img_names_high.pkl'))
  
 
 if __name__=="__main__":

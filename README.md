@@ -70,7 +70,7 @@ After inverting the images and finding the decision boundary in the latent space
 
 **Example:**
 ```powershell
-python invert_imgs.py --path_latents "Dataset\res512\latent_codes.pkl" --path_boundary "Dataset\res512\boundary_1e-06_class.pkl" --path_classifier "Dataset\res512\classifier_1e-06_class.pkl"--path_G "Dataset\res512\TrainedModels_res512\network-snapshot-009404.pkl" --path_img "Dataset\imgs_512\Exp06_07_0036.tif" --path_output "Dataset\outputs"
+python invert_imgs.py --path_latents "Dataset\res512\latent_codes.pkl" --path_boundary "Dataset\res512\boundary.pkl" --path_classifier "Dataset\res512\classifier.pkl"--path_G "Dataset\res512\TrainedModels_res512\network-snapshot-009404.pkl" --path_img "Dataset\imgs_512\Exp06_07_0036.tif" --path_output "Dataset\outputs"
 ```
 
 **Arguments:**
