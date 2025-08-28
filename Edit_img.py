@@ -33,25 +33,15 @@ def parse_args():
   
   parser.add_argument('--path_latents', required= True, type=str,
                        help='Full path to the laten code file (*.pkl).')
-#   parser.add_argument('--res', type=int,
-#                         help='size of images')
-  
+
   parser.add_argument('--path_boundary', required = True, type= str, help = 'Full path to the boundary file *.pkl')
   parser.add_argument('--path_classifier', required = False, type= str, help = 'Full path to the classifier file: *.pkl')
   
 #   parser.add_argument('--max_omega', type=float, default =0.15, help = 'Maximum value for omega to determine the maximum editing')
   parser.add_argument('--path_G', required = True, help = 'Full path to the pre-trained generator')
   parser.add_argument('--path_output', required = True, help = 'Full path to the pre-trained')
-
-#   parser.add_argument('--RES', required= True, type = int,
-#                       help = 'Representative image size' )
-#   parser.add_argument('--train_img_size', type =int, default= 256,
-#                       help = 'training image size, it can be smaller than RES.')
-#   parser.add_argument('--img_channels', type= int, default= 1,
-#                       help = 'number of channels. Default is 1 (binary image)')
-#   parser.add_argument('--z_channels', type = int, default = 16,
-#                       help = 'number of channles in noise vector.')
-
+#   parser.add_argument('--res', type=int,
+#                         help='size of images')
   
   return parser.parse_args()
 
