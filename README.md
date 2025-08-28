@@ -1,6 +1,7 @@
+# PoreEditGAN
 This repository provides codes and documentation for a two-part paper recenty submitted to JGR: Solid Earth. This main branch contains the code for the second part of the paper titled *"Transient porosity during fluid-mineral interaction. Part 2: Generative AI"*. For the part 1 see the branch "paper-part1". [Here](https://doi.org/10.22541/essoar.175587740.05926718/v1) you can read the preprint. This project is part of my PhD at Utrecht University, funded by European Reseach Councoul (ERC) starting grant 'nanoEARTH' (#852069).
 
-## PoreEditGAN
+## Overview
 This main branch provides codes for editing pores using the latent space of pre-trained GANs. See the branch for the first part ("paper-part1") for characterising the pore space using SMDs. 
 
 To edit an image, a few steps should be taken in order. Here is the summary of these steps (more details can be found in our paper):
@@ -12,12 +13,21 @@ Here, we use a hybrid method consists of training an encoder followed by an opti
 4) After inverting the images, a binary decision boundary should be found in the latent space. This binary boundary in our case is between connected and disconnected pores. To find this boundary, we need to label the inverted images (here as connected with label 1, and disconnected labelled as 0). Then, a linear support vector machine (SVM) is used to find the hyperplane in the latent space separating the connected and disconnected regions, following the work [InterFaceGAN](https://genforce.github.io/interfacegan/).
 5) The last step, it to push the the inverted code of the disconnected image along the direction orthogonal to the hyperplane to connect the pore network. 
 
+## Environment setup
+You can create the Conda environment with any name you like (e.g., smd_env), then install all packages listed in `environment.yml`:
+
+```
+conda env create -f environment.yml -n smd_env
+conda activate smd_env
+```
+
+## Data availability
+The dataset for this project consists of segmented images and timelog data for the experiments are available on Zenodo: 
+
 ## Usage
 For training the styleGAN2-ADA and the encoder, see the github pages mentioned above. Here, we assume that those steps are already taken. However, you can find the pre-trained generator and encoder in our Zenodo page.
-<!-- Here you can find some guidelines and example to run the scripts for microstructure characterisation using Statistical microstructure descriptors (SMDs) and editing the pores using our trained models.
-The codes here are for images of size 512 by 512 pixels. -->
 
- <!-- For smaller images (256 by 256), see the branch ``feature-res256``. -->
+ For smaller images (256 by 256), see the branch ``feature-res256``.
 
 
 ### Invert images
