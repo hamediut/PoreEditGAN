@@ -27,7 +27,7 @@ The dataset for this project consists of segmented images and timelog data for t
 ## Usage
 For training the styleGAN2-ADA and the encoder, see the github pages mentioned above. Here, we assume that those steps are already taken. However, you can find the pre-trained generator and encoder in our Zenodo page.
 
- For smaller images (256 by 256), see the branch ``feature-res256``.
+ For smaller images (256 by 256), and editing images of natural sample as described in the paper, see the branch ``feature-res256``.
 
 
 ### Invert images
