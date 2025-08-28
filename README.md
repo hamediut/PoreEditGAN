@@ -1,6 +1,6 @@
 ⚠️ **Work in Progress**: This branch is under active development. Code and documentation are being updated regularly.
 
-This repository provides codes and documentation for a two-part paper recenty submitted to JGR: Solid Earth. This main branch contains the code for the second part of the paper titled *"Transient porosity during fluid-mineral interaction. Part 2: Generative AI"*. For the part 1 see the branch "paper-part1". The link to the papers will be provided when the pre-print versions are out. This project is part of my PhD at Utrecht University, funded by European Reseach Councoul (ERC) starting grant 'nanoEARTH' (#852069).
+This repository provides codes and documentation for a two-part paper recenty submitted to JGR: Solid Earth. This main branch contains the code for the second part of the paper titled *"Transient porosity during fluid-mineral interaction. Part 2: Generative AI"*. For the part 1 see the branch "paper-part1". [Here](https://doi.org/10.22541/essoar.175587740.05926718/v1) you can read the preprint. This project is part of my PhD at Utrecht University, funded by European Reseach Councoul (ERC) starting grant 'nanoEARTH' (#852069).
 
 ## PoreEditGAN
 This main branch provides codes for editing pores using the latent space of pre-trained GANs. It also contains the code for characterising the pore networks using spatial correlation functions. 
