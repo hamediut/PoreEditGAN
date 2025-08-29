@@ -23,7 +23,10 @@ conda activate smd_env
 
 ## Data availability
 The dataset for this project consists of segmented images and timelog data for the experiments are available on Zenodo: 
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16941923.svg)](https://doi.org/10.5281/zenodo.16941923)
+
+
 
 
 ## Usage
