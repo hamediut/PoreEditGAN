@@ -23,6 +23,8 @@ conda activate smd_env
 
 ## Data availability
 The dataset for this project consists of segmented images and timelog data for the experiments are available on Zenodo: 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.<DATASET_DOI_PART2>.svg)](https://doi.org/10.5281/zenodo.<DATASET_DOI_PART2>)
+
 
 ## Usage
 For training the styleGAN2-ADA and the encoder, see the github pages mentioned above. Here, we assume that those steps are already taken. However, you can find the pre-trained generator and encoder in our Zenodo page.
