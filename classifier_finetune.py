@@ -58,6 +58,8 @@ def parse_args():
   
   parser.add_argument('--lr', type= float, default = 0.001, help= 'Learning rate for adam optimizer')
   parser.add_argument('--path_outputs', type =str, required= True, help = 'Path to the folder to save outputs')
+
+  parser.add_argument('--num_epochs', type = int, default= 50, help= 'Number of epochs to fme-tune the resnet50 model.')
 #   parser.add_argument('--res', type=int,
 #                         help='size of images')
   
@@ -142,7 +144,7 @@ def fine_tune_resnet50()-> None:
    criterion = criterion.to(device)
 
    ###-------------------------------------
-   EPOCHS = 20
+   EPOCHS = args.num_epochs
    max_acc = 0.0
    best_model_wts = copy.deepcopy(model.state_dict())
 
@@ -233,6 +235,8 @@ def fine_tune_resnet50()-> None:
    # plt.show()
 
    ##-----------------------------------labeling images using the best model 
+
+
    model.load_state_dict(best_model_wts)
    model.eval()
 
@@ -240,15 +244,23 @@ def fine_tune_resnet50()-> None:
 
    with torch.no_grad():
       for image_file in tqdm(os.listdir(args.path_imgs)):
-         # img_names.append(os.path.splitext(image_file)[0])
-         image = tifffile.imread(os.path.join(args.path_imgs, image_file))
-         image = np.stack((image,)*3, axis=-1) # the model is trained with 3 channels 
-         image = img_transform(image).to(device)
+         if image_file.lower().endswith((".tif", ".tiff")):
+             # img_names.append(os.path.splitext(image_file)[0])
+            image = tifffile.imread(os.path.join(args.path_imgs, image_file))
+            image = np.stack((image,)*3, axis=-1) # the model is trained with 3 channels 
+            image = img_transform(image).to(device)
          
-         output = model(image.unsqueeze(0))
-         model_preds.append(output.item())
+            output = model(image.unsqueeze(0))
+            model_preds.append(output.item())
    df_labels = pd.read_csv(args.path_labels)
-   df_labels['preds'] = model_preds
+   print(f'Number of predicted labels: {len(model_preds)}')
+   print(f'Number of rows in the dataframe: {df_labels.shape[0]}')
+   if len(model_preds) > df_labels.shape[0]:
+       df_labels['preds'] = model_preds[:df_labels.shape[0]]
+   else:
+       df_labels['preds'] = model_preds
+       
+       
 
    ## Classify the images into 3 classes at the end:
    # 0: disconnected
@@ -265,9 +277,9 @@ def fine_tune_resnet50()-> None:
     ]
    choices = [0, 1, 2]
 
-   df_labels['preds_label'] = np.select(conditions, choices)
+   df_labels['label'] = np.select(conditions, choices)
 
-   df_labels.to_csv(os.path.join(args.path_outputs, 'labels.csv'), index= False)
+   df_labels.to_csv(os.path.join(args.path_outputs, 'df_labels.csv'), index= False)
 
 
 if __name__=='__main__':

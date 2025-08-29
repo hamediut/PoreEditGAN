@@ -42,13 +42,28 @@ The output is a dictionary file ('latent_codes.pkl') whose keys are the image fi
 
 **Arguments:**
 Here are arguments for the above script:
-- `--path_input`: path to the folder of labelled images, that is, the images you want to invert.
+- `--path_imgs`: path to the folder of labelled images, that is, the images you want to invert.
 - `--path_G`: full path to the pre-trained generator.
 - `--path_E`: full path to the pre-trained encoder.
 - `--path_VGG`: full path to the pre-trained VGG model.
 - `--res`: image resolution, default = 512
-- `--path_output`: path to the output folder to save dictinary containing inverted codes. The script also outputs the different loss values during the training and export it as log.txt file which is used in the next step. Also the reconstructed image after inverting the image are also are saved in this folder. For other arguments see the docstring of the script.
+- `--path_output`: path to the output folder to save dictinary containing inverted codes. 
 
+The script also outputs the different loss values during the training and export it as log.txt file which is used in the next step. Also the reconstructed image after inverting the image are also are saved in this folder. For other arguments see the docstring of the script.
+
+### Labelling images
+To label the images, we fine-tuned ResNet50 model by keeping the convolutional layers as feature extractors and replacing its final fully connected layer with three fully connected layers to perform binary classifier. We only labelled 600 images manually which can be found in the column "HLP" (human level performance) in the "Data_classifier.csv". These labels are used as true labels for training the classifier. To fine-tune the classifier, run:
+
+**Example:**
+```powershell
+python classifier_finetune.py --path_imgs "Dataset\res512\labelled_images" --path_labels "Dataset\res512\Data_classifier.csv" --path_outputs "Dataset\outputs" 
+```
+Note that the images are already labelled and can be found in the df_labels.csv file. So, you can skip this step if the goal is to reproduce our results. But if you want to label your own images, you need to first manually label a few percents of your images and put it in the similar column as in the Data_classifier.csv and run the script.
+**Arguments:**
+Here are arguments for the above script:
+- `--path_imgs`: path to the folder of labelled images, the images selected to be labelled.
+- `--path_labels`: full path to csv files containing the image name and manual labels for some of the images (HLP column)
+- `--path_output`: path to the output folder to save the fine-tuned classifier('classifier_best.pt') and csv file with labels for all images.
 
 ### Semantic boundary
 Once the images are inverted and their corresponding latent codes are obtained (see the previous step), the semantic boundary for editing the pore connecivity can be found by running the following:
